@@ -29,7 +29,7 @@ include(dirname(__FILE__).'/birthdaygift.php');
 
 if (Tools::getIsset('secure_key'))
 {
-	$secure_key = Configuration::get('BDAY_SECURE_KEY');
+	$secure_key = Configuration::get('BDAY_SECURITY_KEY');
 	if (!empty($secure_key) && $secure_key === Tools::getValue('secure_key'))
 	{
 		$birthdaygift = new BirthdayGift();
