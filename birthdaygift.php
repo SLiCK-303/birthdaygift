@@ -226,7 +226,7 @@ class BirthdayGift extends Module
 
 		$cron_info = '';
 		if (Shop::getContext() === Shop::CONTEXT_SHOP)
-			$cron_info = $this->l('Define the settings and paste the following URL in the crontab, or call it manually on a daily basis:').						'<br><b>'.$this->context->shop->getBaseURL().'modules/birthdaygift/cron.php?secure_key='.Configuration::get('BDAY_SECURE_KEY').'</b>';
+			$cron_info = $this->l('Define the settings and paste the following URL in the crontab, or call it manually on a daily basis:').						'<br><b>'.$this->context->shop->getBaseURL().'modules/birthdaygift/cron.php?secure_key='.Configuration::get('BDAY_SECURITY_KEY').'</b>';
 
 		$fields_form_1 = [
 			'form' => [
