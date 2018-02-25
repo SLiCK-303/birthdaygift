@@ -1,0 +1,17 @@
+module_name: Birthday Gift
+compatible_versions: 1.0.0+
+author: SLiCK-303
+category: front office
+tags:
+  - birthday gift
+  - birthday
+  - gift
+  - email
+  - voucher
+  - cron
+description_short: The module birthday gift, will send an email to a customer with a birthday today, and also make a voucher if desired.
+description: description.md
+images:
+  - image-1.png
+  - image-2.png
+license: AFL
