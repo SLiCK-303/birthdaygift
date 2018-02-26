@@ -243,7 +243,7 @@ class BirthdayGift extends Module
 			'form' => [
 				'legend' => [
 					'title' => $this->l('Information'),
-					'icon' => 'icon-cogs',
+					'icon'  => 'icon-cogs',
 				],
 				'description' => $cron_info,
 			]
@@ -253,7 +253,7 @@ class BirthdayGift extends Module
 			'form' => [
 				'legend' => [
 					'title' => $this->l('E-Mails to send'),
-					'icon' => 'icon-cogs',
+					'icon'  => 'icon-cogs',
 				],
 				'description' => sprintf($this->l('Todays process will send %d e-mail(s).'), $nu),
 			]
@@ -263,99 +263,99 @@ class BirthdayGift extends Module
 			'form' => [
 				'legend' => [
 					'title' => $this->l('Settings'),
-					'icon' => 'icon-cogs'
+					'icon'  => 'icon-cogs'
 				],
 				'input' => [
-                    [
-                        'type'    => 'switch',
-                        'label'   => $this->l('Send birthday message: '),
-                        'name'    => 'BDAY_GIFT_ACTIVE',
-                        'desc'    => $this->l('Activate sending of birthday message'),
-                        'is_bool' => true,
-                        'values'  => [
-                            [
-                                'id'    => 'active_on',
-                                'value' => 1,
-                                'label' => $this->l('Enabled'),
-                            ],
-                            [
-                                'id'    => 'active_off',
-                                'value' => 0,
-                                'label' => $this->l('Disabled'),
-                            ],
-                        ],
-                    ],
 					[
-						'type' => 'radio',
-						'label' => $this->l('Include voucher: '),
-						'name' => 'BDAY_VOUCHER',
+						'type'    => 'switch',
+						'label'   => $this->l('Send birthday message: '),
+						'name'    => 'BDAY_GIFT_ACTIVE',
+						'desc'    => $this->l('Activate sending of birthday message'),
 						'is_bool' => true,
-						'values' => [
+						'values'  => [
 							[
-								'id' => 'include_voucher_enable',
-								'value' => 1,
-								'checked' => 'checked',
-								'label' => $this->l('Enabled')
+								'id'      => 'active_on',
+								'value'   => 1,
+								'label'   => $this->l('Enabled'),
 							],
 							[
-								'id' => 'include_voucher_disable',
-								'value' => 0,
-								'label' => $this->l('Disabled')
+								'id'      => 'active_off',
+								'value'   => 0,
+								'label'   => $this->l('Disabled'),
 							],
 						],
 					],
 					[
-						'type' => 'text',
-						'label' => $this->l('Voucher prefix: '),
-						'name' => 'BDAY_VOUCHER_PREFIX',
-						'desc' => $this->l('Prefix for the voucher')
-					],
-                    [
-                        'type'   => 'radio',
-                        'label'  => $this->l('Voucher type: '),
-                        'name'   => 'BDAY_VOUCHER_TYPE',
-                        'values' => [
-                            [
-                                'id'    => 'discount_type1',
-                                'value' => 1,
-                                'label' => $this->l('Voucher offering a percentage'),
-                            ],
-                            [
-                                'id'    => 'discount_type2',
-                                'value' => 2,
-                                'label' => $this->l('Voucher offering a fixed amount (by currency)'),
-                            ],
-                        ],
-                    ],
-					[
-						'type' => 'text',
-						'label' => $this->l('Voucher value: '),
-						'name' => 'BDAY_VOUCHER_VALUE',
-						'desc' => $this->l('Fixed or Percentage value')
-					],
-					[
-						'type' => 'text',
-						'label' => $this->l('Minimal Order: '),
-						'name' => 'BDAY_MINIMAL_ORDER',
-						'desc' => $this->l('The minimum order amount needed to use the voucher')
-					],
-					[
-						'type' => 'radio',
-						'label' => $this->l('Valid order needed: '),
-						'name' => 'BDAY_VALID_ORDER',
-						'desc' => $this->l('Disabled equals send to all users'),
+						'type'    => 'radio',
+						'label'   => $this->l('Include voucher: '),
+						'name'    => 'BDAY_VOUCHER',
 						'is_bool' => true,
-						'values' => [
+						'values'  => [
 							[
-								'id' => 'valid_order_enable',
-								'value' => 1,
+								'id'      => 'include_voucher_enable',
+								'value'   => 1,
 								'checked' => 'checked',
-								'label' => $this->l('Enabled')
+								'label'   => $this->l('Enabled')
 							],
 							[
-								'id' => 'valid_order_disable',
-								'value' => 0,
-								'label' => $this->l('Disabled')
+								'id'      => 'include_voucher_disable',
+								'value'   => 0,
+								'label'   => $this->l('Disabled')
+							],
+						],
+					],
+					[
+						'type'    => 'text',
+						'label'   => $this->l('Voucher prefix: '),
+						'name'    => 'BDAY_VOUCHER_PREFIX',
+						'desc'    => $this->l('Prefix for the voucher')
+					],
+					[
+						'type'    => 'radio',
+						'label'   => $this->l('Voucher type: '),
+						'name'    => 'BDAY_VOUCHER_TYPE',
+						'values'  => [
+							[
+								'id'      => 'discount_type1',
+								'value'   => 1,
+								'label'   => $this->l('Voucher offering a percentage'),
+							],
+							[
+								'id'      => 'discount_type2',
+								'value'   => 2,
+								'label'   => $this->l('Voucher offering a fixed amount (by currency)'),
+							],
+						],
+					],
+					[
+						'type'    => 'text',
+						'label'   => $this->l('Voucher value: '),
+						'name'    => 'BDAY_VOUCHER_VALUE',
+						'desc'    => $this->l('Fixed or Percentage value')
+					],
+					[
+						'type'    => 'text',
+						'label'   => $this->l('Minimal Order: '),
+						'name'    => 'BDAY_MINIMAL_ORDER',
+						'desc'    => $this->l('The minimum order amount needed to use the voucher')
+					],
+					[
+						'type'    => 'radio',
+						'label'   => $this->l('Valid order needed: '),
+						'name'    => 'BDAY_VALID_ORDER',
+						'desc'    => $this->l('Disabled equals send to all users'),
+						'is_bool' => true,
+						'values'  => [
+							[
+								'id'      => 'valid_order_enable',
+								'value'   => 1,
+								'checked' => 'checked',
+								'label'   => $this->l('Enabled')
+							],
+							[
+								'id'      => 'valid_order_disable',
+								'value'   => 0,
+								'label'   => $this->l('Disabled')
 							],
 						],
 					],
@@ -389,13 +389,13 @@ class BirthdayGift extends Module
 	public function getConfigFieldsValues()
 	{
 		return [
-			'BDAY_GIFT_ACTIVE' => Tools::getValue('BDAY_GIFT_ACTIVE', (int)Configuration::get('BDAY_GIFT_ACTIVE')),
-			'BDAY_VOUCHER' => Tools::getValue('BDAY_VOUCHER', (int)Configuration::get('BDAY_VOUCHER')),
-			'BDAY_VOUCHER_TYPE' => Tools::getValue('BDAY_VOUCHER_TYPE', (int)Configuration::get('BDAY_VOUCHER_TYPE')),
-			'BDAY_VOUCHER_VALUE' => Tools::getValue('BDAY_VOUCHER_VALUE', (float)Configuration::get('BDAY_VOUCHER_VALUE')),
+			'BDAY_GIFT_ACTIVE'    => Tools::getValue('BDAY_GIFT_ACTIVE', (int)Configuration::get('BDAY_GIFT_ACTIVE')),
+			'BDAY_VOUCHER'        => Tools::getValue('BDAY_VOUCHER', (int)Configuration::get('BDAY_VOUCHER')),
+			'BDAY_VOUCHER_TYPE'   => Tools::getValue('BDAY_VOUCHER_TYPE', (int)Configuration::get('BDAY_VOUCHER_TYPE')),
+			'BDAY_VOUCHER_VALUE'  => Tools::getValue('BDAY_VOUCHER_VALUE', (float)Configuration::get('BDAY_VOUCHER_VALUE')),
 			'BDAY_VOUCHER_PREFIX' => Tools::getValue('BDAY_VOUCHER_PREFIX', (string)Configuration::get('BDAY_VOUCHER_PREFIX')),
-			'BDAY_MINIMAL_ORDER' => Tools::getValue('BDAY_MINIMAL_ORDER', (float)Configuration::get('BDAY_MINIMAL_ORDER')),
-			'BDAY_VALID_ORDER' => Tools::getValue('BDAY_VALID_ORDER', (int)Configuration::get('BDAY_VALID_ORDER'))
+			'BDAY_MINIMAL_ORDER'  => Tools::getValue('BDAY_MINIMAL_ORDER', (float)Configuration::get('BDAY_MINIMAL_ORDER')),
+			'BDAY_VALID_ORDER'    => Tools::getValue('BDAY_VALID_ORDER', (int)Configuration::get('BDAY_VALID_ORDER'))
 		];
 	}}
 
