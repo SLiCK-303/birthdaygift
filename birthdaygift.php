@@ -10,7 +10,7 @@
  * http://opensource.org/licenses/afl-3.0.php
  *
  * @package    birthdaygift
- * @author     slick-303 <slick_303@hotmail.com>
+ * @author     SLiCK-303 <slick_303@hotmail.com>
  * @copyright  2018 SLiCK-303
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 **/
