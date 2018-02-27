@@ -29,14 +29,14 @@ class BirthdayGift extends Module
 	function __construct()
 	{
 		$this->name = 'birthdaygift';
-		$this->version = '1.0.1';
+		$this->version = '1.0.2';
 		$this->author = 'SLiCK-303';
 		$this->tab = 'pricing_promotion';
 		$this->need_instance = 0;
 
 		$this->bootstrap = true;
 		parent::__construct();
-		
+
 		$this->displayName = $this->l('Birthday Gift');
 		$this->description = $this->l('Offer your clients a birthday gift automatically');
 
@@ -46,7 +46,7 @@ class BirthdayGift extends Module
 		if($secure_key === false)
 			Configuration::updateValue('BDAY_SECURITY_KEY', Tools::strtoupper(Tools::passwdGen(16)));
 	}
-		
+
 	public function install()
 	{
 		if (!parent::install() ||
@@ -55,6 +55,7 @@ class BirthdayGift extends Module
 			!Configuration::updateValue('BDAY_VOUCHER_TYPE', 2) ||
 			!Configuration::updateValue('BDAY_VOUCHER_VALUE', 0) ||
 			!Configuration::updateValue('BDAY_VOUCHER_PREFIX', 'BDAY') ||
+			!Configuration::updateValue('BDAY_VOUCHER_DAYS', 30) ||
 			!Configuration::updateValue('BDAY_MINIMAL_ORDER', 0) ||
 			!Configuration::updateValue('BDAY_VALID_ORDER', 0)
 		) {
@@ -72,6 +73,7 @@ class BirthdayGift extends Module
 			!Configuration::deleteByName('BDAY_VOUCHER_TYPE') ||
 			!Configuration::deleteByName('BDAY_VOUCHER_VALUE') ||
 			!Configuration::deleteByName('BDAY_VOUCHER_PREFIX') ||
+			!Configuration::deleteByName('BDAY_VOUCHER_DAYS') ||
 			!Configuration::deleteByName('BDAY_MINIMAL_ORDER') ||
 			!Configuration::deleteByName('BDAY_VALID_ORDER')
 		) {
@@ -107,6 +109,10 @@ class BirthdayGift extends Module
 			if (!Validate::isString($prefix) || empty($prefix))
 				$errors[] = $this->l('The voucher prefix is invalid. Please enter a value.');
 
+			$days = Tools::getValue('BDAY_VOUCHER_DAYS');
+			if (!Validate::isFloat($days) || $days < 0)
+				$errors[] = $this->l('The voucher days is invalid. Please enter a positive value.');
+
 			$min = Tools::getValue('BDAY_MINIMAL_ORDER');
 			if (!Validate::isFloat($min) || $min < 0)
 				$errors[] = $this->l('The minimal order amount is invalid. Please enter a positive number.');
@@ -124,6 +130,7 @@ class BirthdayGift extends Module
 				Configuration::updateValue('BDAY_VOUCHER_TYPE', (int)$type);
 				Configuration::updateValue('BDAY_VOUCHER_VALUE', (float)$value);
 				Configuration::updateValue('BDAY_VOUCHER_PREFIX', (string)$prefix);
+				Configuration::updateValue('BDAY_VOUCHER_DAYS', (int)$days);
 				Configuration::updateValue('BDAY_MINIMAL_ORDER', (float)$min);
 				Configuration::updateValue('BDAY_VALID_ORDER', (int)$valid);
 				$output = $this->displayConfirmation($this->l('Settings updated.'));
@@ -138,6 +145,7 @@ class BirthdayGift extends Module
 		$voucher_prefix = (string) Configuration::get('BDAY_VOUCHER_PREFIX');
 		$voucher_type = (int) Configuration::get('BDAY_VOUCHER_TYPE');
 		$voucher_amount = (float) Configuration::get('BDAY_VOUCHER_VALUE');
+		$voucher_days = (int) Configuration::get('BDAY_VOUCHER_DAYS');
 		$min_order = (float) Configuration::get('BDAY_MINIMAL_ORDER');
 
 		$cart_rule = new CartRule();
@@ -148,7 +156,7 @@ class BirthdayGift extends Module
 			$cart_rule->reduction_amount = $voucher_amount;
 
 		$cart_rule->id_customer = (int)$id_customer;
-		$cart_rule->date_to = date('Y-m-d H:i:s', time() + 31536000); // + 1 year
+		$cart_rule->date_to = strftime('%Y-%m-%d', strtotime('+'.$voucher_days.' day'));
 		$cart_rule->date_from = date('Y-m-d H:i:s');
 		$cart_rule->quantity = 1;
 		$cart_rule->quantity_per_user = 1;
@@ -176,6 +184,7 @@ class BirthdayGift extends Module
 		$voucher_prefix = (string) Configuration::get('BDAY_VOUCHER_PREFIX');
 		$voucher_type = (int) Configuration::get('BDAY_VOUCHER_TYPE');
 		$voucher_amount = (float) Configuration::get('BDAY_VOUCHER_VALUE');
+		$voucher_days = (int) Configuration::get('BDAY_VOUCHER_DAYS');
 		$min_order = (float) Configuration::get('BDAY_MINIMAL_ORDER');
 		$valid_order = (int) Configuration::get('BDAY_VALID_ORDER');
 
@@ -197,18 +206,27 @@ class BirthdayGift extends Module
 
 		foreach ($users as $user)
 		{
-			if ($voucher_active == 1)
-				$this->createDiscount($user['id_customer']);
-
+			if ($voucher_active == 1) {
+				$voucher = $this->createDiscount($user['id_customer']);
+				$code = $voucher->code;
+				$template = 2;
+			} else {
+				$voucher = false;
+				$code = '';
+				$template = 1;
+			}
 			$template_vars = [
-				'{firstname}' => $user['firstname'],
-				'{lastname}'  => $user['lastname']
+				'{firstname}'   => $user['firstname'],
+				'{lastname}'    => $user['lastname'],
+				'{amount}'      => $voucher_amount,
+				'{days}'        => $voucher_days,
+				'{voucher_num}' => $code
 			];
 
 			if (Validate::isEmail($user['email'])) {
 				Mail::Send(
 						(int)Configuration::get('PS_LANG_DEFAULT'),
-						'birthday',
+						'birthday'.$template.'',
 						sprintf(Mail::l('Happy Birthday', (int)Configuration::get('PS_LANG_DEFAULT'))),
 						$template_vars,
 						($user['email'] ? $user['email'] : null),
@@ -323,7 +341,7 @@ class BirthdayGift extends Module
 							[
 								'id'      => 'discount_type2',
 								'value'   => 2,
-								'label'   => $this->l('Voucher offering a fixed amount (by currency)'),
+								'label'   => $this->l('Voucher offering a fixed amount'),
 							],
 						],
 					],
@@ -332,6 +350,12 @@ class BirthdayGift extends Module
 						'label'   => $this->l('Voucher value: '),
 						'name'    => 'BDAY_VOUCHER_VALUE',
 						'desc'    => $this->l('Fixed or Percentage value')
+					],
+					[
+						'type'    => 'text',
+						'label'   => $this->l('Voucher validity'),
+						'name'    => 'BDAY_VOUCHER_DAYS',
+						'suffix'  => $this->l('day(s)'),
 					],
 					[
 						'type'    => 'text',
@@ -379,8 +403,8 @@ class BirthdayGift extends Module
 		$helper->token = Tools::getAdminTokenLite('AdminModules');
 		$helper->tpl_vars = [
 			'fields_value' => $this->getConfigFieldsValues(),
-			'languages' => $this->context->controller->getLanguages(),
-			'id_language' => $this->context->language->id
+			'languages'    => $this->context->controller->getLanguages(),
+			'id_language'  => $this->context->language->id
 		];
 
 		return $helper->generateForm([$fields_form_1, $fields_form_2, $fields_form_3]);
@@ -394,6 +418,7 @@ class BirthdayGift extends Module
 			'BDAY_VOUCHER_TYPE'   => Tools::getValue('BDAY_VOUCHER_TYPE', (int)Configuration::get('BDAY_VOUCHER_TYPE')),
 			'BDAY_VOUCHER_VALUE'  => Tools::getValue('BDAY_VOUCHER_VALUE', (float)Configuration::get('BDAY_VOUCHER_VALUE')),
 			'BDAY_VOUCHER_PREFIX' => Tools::getValue('BDAY_VOUCHER_PREFIX', (string)Configuration::get('BDAY_VOUCHER_PREFIX')),
+			'BDAY_VOUCHER_DAYS'   => Tools::getValue('BDAY_VOUCHER_DAYS', (int)Configuration::get('BDAY_VOUCHER_DAYS')),
 			'BDAY_MINIMAL_ORDER'  => Tools::getValue('BDAY_MINIMAL_ORDER', (float)Configuration::get('BDAY_MINIMAL_ORDER')),
 			'BDAY_VALID_ORDER'    => Tools::getValue('BDAY_VALID_ORDER', (int)Configuration::get('BDAY_VALID_ORDER'))
 		];
