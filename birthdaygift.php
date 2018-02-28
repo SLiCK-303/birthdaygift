@@ -29,7 +29,7 @@ class BirthdayGift extends Module
 	function __construct()
 	{
 		$this->name = 'birthdaygift';
-		$this->version = '1.0.2';
+		$this->version = '1.0.3';
 		$this->author = 'SLiCK-303';
 		$this->tab = 'pricing_promotion';
 		$this->need_instance = 0;
@@ -38,7 +38,7 @@ class BirthdayGift extends Module
 		parent::__construct();
 
 		$this->displayName = $this->l('Birthday Gift');
-		$this->description = $this->l('Offer your clients a birthday gift automatically');
+		$this->description = $this->l('Offer your clients a birthday gift automatically.');
 
 		$this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
@@ -51,13 +51,14 @@ class BirthdayGift extends Module
 	{
 		if (!parent::install() ||
 			!Configuration::updateValue('BDAY_GIFT_ACTIVE', 1) ||
-			!Configuration::updateValue('BDAY_VOUCHER', 0) ||
+			!Configuration::updateValue('BDAY_CUSTOMER_GROUP', '3') ||
+			!Configuration::updateValue('BDAY_VOUCHER', 1) ||
 			!Configuration::updateValue('BDAY_VOUCHER_TYPE', 2) ||
-			!Configuration::updateValue('BDAY_VOUCHER_VALUE', 0) ||
+			!Configuration::updateValue('BDAY_VOUCHER_VALUE', 5) ||
 			!Configuration::updateValue('BDAY_VOUCHER_PREFIX', 'BDAY') ||
 			!Configuration::updateValue('BDAY_VOUCHER_DAYS', 30) ||
-			!Configuration::updateValue('BDAY_MINIMAL_ORDER', 0) ||
-			!Configuration::updateValue('BDAY_VALID_ORDER', 0)
+			!Configuration::updateValue('BDAY_MINIMAL_ORDER', 5) ||
+			!Configuration::updateValue('BDAY_VALID_ORDER', 1)
 		) {
 			return false;
 		}
@@ -69,6 +70,7 @@ class BirthdayGift extends Module
 		if (!parent::uninstall() ||
 			!Configuration::deleteByName('BDAY_SECURITY_KEY') ||
 			!Configuration::deleteByName('BDAY_GIFT_ACTIVE') ||
+			!Configuration::deleteByName('BDAY_CUSTOMER_GROUP') ||
 			!Configuration::deleteByName('BDAY_VOUCHER') ||
 			!Configuration::deleteByName('BDAY_VOUCHER_TYPE') ||
 			!Configuration::deleteByName('BDAY_VOUCHER_VALUE') ||
@@ -96,6 +98,10 @@ class BirthdayGift extends Module
 			$voucher = Tools::getValue('BDAY_VOUCHER');
 			if (!Validate::isInt($voucher) || $voucher < 0 || $voucher > 1)
 				$errors[] = $this->l('The voucher active is invalid. Please enter yes or no.');
+
+			$cgroup = Tools::getValue('BDAY_CUSTOMER_GROUP');
+			if (!Validate::isString($cgroup) || empty($cgroup))
+				$errors[] = $this->l('The customer group value is invalid. Please enter a valid group.');
 
 			$type = Tools::getValue('BDAY_VOUCHER_TYPE');
 			if (!Validate::isInt($type) || $type < 1 || $type > 2)
@@ -127,6 +133,7 @@ class BirthdayGift extends Module
 			{
 				Configuration::updateValue('BDAY_GIFT_ACTIVE', (int)$active);
 				Configuration::updateValue('BDAY_VOUCHER', (int)$voucher);
+				Configuration::updateValue('BDAY_CUSTOMER_GROUP', (string)$cgroup);
 				Configuration::updateValue('BDAY_VOUCHER_TYPE', (int)$type);
 				Configuration::updateValue('BDAY_VOUCHER_VALUE', (float)$value);
 				Configuration::updateValue('BDAY_VOUCHER_PREFIX', (string)$prefix);
@@ -140,7 +147,7 @@ class BirthdayGift extends Module
 		return $output.$this->renderForm();
 	}
 
-	private function createDiscount($id_customer)
+	private function createVoucher($id_customer)
 	{
 		$voucher_prefix = (string) Configuration::get('BDAY_VOUCHER_PREFIX');
 		$voucher_type = (int) Configuration::get('BDAY_VOUCHER_TYPE');
@@ -175,12 +182,13 @@ class BirthdayGift extends Module
 		return $cart_rule;
 	}
 
-	public function createTodaysVouchers($count = false)
+	public function createTodaysBirthdays($count = false)
 	{
 		$emailsSent = 0;
 		$shop_email = (string) Configuration::get('PS_SHOP_EMAIL');
 		$shop_name = (string) Configuration::get('PS_SHOP_NAME');
 		$voucher_active = (int) Configuration::get('BDAY_VOUCHER');
+		$customer_group = (array) Configuration::get('BDAY_CUSTOMER_GROUP');
 		$voucher_prefix = (string) Configuration::get('BDAY_VOUCHER_PREFIX');
 		$voucher_type = (int) Configuration::get('BDAY_VOUCHER_TYPE');
 		$voucher_amount = (float) Configuration::get('BDAY_VOUCHER_VALUE');
@@ -188,18 +196,24 @@ class BirthdayGift extends Module
 		$min_order = (float) Configuration::get('BDAY_MINIMAL_ORDER');
 		$valid_order = (int) Configuration::get('BDAY_VALID_ORDER');
 
+		$customer_group = implode(',', $customer_group);
+
 		if ($valid_order == 1) 
 			$users = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS('
-				SELECT DISTINCT c.id_customer, firstname, lastname, email
+				SELECT DISTINCT c.id_customer, c.firstname, c.lastname, c.email
 				FROM '._DB_PREFIX_.'customer c
+				LEFT JOIN '._DB_PREFIX_.'customer_group cg ON (c.id_customer = cg.id_customer)
 				LEFT JOIN '._DB_PREFIX_.'orders o ON (c.id_customer = o.id_customer)
 				WHERE o.valid = 1
+				AND cg.id_group IN ('.$customer_group.')
 				AND c.birthday LIKE \'%'.date('-m-d').'\'');
 		else
 			$users = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS('
-				SELECT DISTINCT id_customer, firstname, lastname, email
-				FROM '._DB_PREFIX_.'customer
-				WHERE birthday LIKE \'%'.date('-m-d').'\'');
+				SELECT DISTINCT c.id_customer, c.firstname, c.lastname, c.email
+				FROM '._DB_PREFIX_.'customer c
+				LEFT JOIN '._DB_PREFIX_.'customer_group cg ON (c.id_customer = cg.id_customer)
+				WHERE cg.id_group IN ('.$customer_group.')
+				AND c.birthday LIKE \'%'.date('-m-d').'\'');
 
 		if ($count || !count($users))
 			return count($users);
@@ -207,7 +221,7 @@ class BirthdayGift extends Module
 		foreach ($users as $user)
 		{
 			if ($voucher_active == 1) {
-				$voucher = $this->createDiscount($user['id_customer']);
+				$voucher = $this->createVoucher($user['id_customer']);
 				$code = $voucher->code;
 				$template = 2;
 			} else {
@@ -251,7 +265,7 @@ class BirthdayGift extends Module
 
 	public function renderForm()
 	{
-		$nu = $this->createTodaysVouchers(true);
+		$bd = $this->createTodaysBirthdays(true);
 
 		$cron_info = '';
 		if (Shop::getContext() === Shop::CONTEXT_SHOP)
@@ -273,7 +287,7 @@ class BirthdayGift extends Module
 					'title' => $this->l('E-Mails to send'),
 					'icon'  => 'icon-cogs',
 				],
-				'description' => sprintf($this->l('Todays process will send %d e-mail(s).'), $nu),
+				'description' => sprintf($this->l('Todays process will send %d e-mail(s).'), $bd),
 			]
 		];
 
@@ -288,7 +302,7 @@ class BirthdayGift extends Module
 						'type'    => 'switch',
 						'label'   => $this->l('Send birthday message: '),
 						'name'    => 'BDAY_GIFT_ACTIVE',
-						'desc'    => $this->l('Activate sending of birthday message'),
+						'hint'    => $this->l('Activate sending of birthday message'),
 						'is_bool' => true,
 						'values'  => [
 							[
@@ -307,6 +321,7 @@ class BirthdayGift extends Module
 						'type'    => 'radio',
 						'label'   => $this->l('Include voucher: '),
 						'name'    => 'BDAY_VOUCHER',
+						'hint'    => $this->l('Activate creating a voucher'),
 						'is_bool' => true,
 						'values'  => [
 							[
@@ -326,12 +341,13 @@ class BirthdayGift extends Module
 						'type'    => 'text',
 						'label'   => $this->l('Voucher prefix: '),
 						'name'    => 'BDAY_VOUCHER_PREFIX',
-						'desc'    => $this->l('Prefix for the voucher')
+						'hint'    => $this->l('Prefix for the voucher code')
 					],
 					[
 						'type'    => 'radio',
 						'label'   => $this->l('Voucher type: '),
 						'name'    => 'BDAY_VOUCHER_TYPE',
+						'hint'    => $this->l('Pick a percentage or fixed amount for the voucher'),
 						'values'  => [
 							[
 								'id'      => 'discount_type1',
@@ -349,25 +365,26 @@ class BirthdayGift extends Module
 						'type'    => 'text',
 						'label'   => $this->l('Voucher value: '),
 						'name'    => 'BDAY_VOUCHER_VALUE',
-						'desc'    => $this->l('Fixed or Percentage value')
+						'hint'    => $this->l('The percentage or fixed amount the voucher is worth')
 					],
 					[
 						'type'    => 'text',
 						'label'   => $this->l('Voucher validity'),
 						'name'    => 'BDAY_VOUCHER_DAYS',
+						'hint'    => $this->l('How many days the voucher is good for'),
 						'suffix'  => $this->l('day(s)'),
 					],
 					[
 						'type'    => 'text',
 						'label'   => $this->l('Minimal Order: '),
 						'name'    => 'BDAY_MINIMAL_ORDER',
-						'desc'    => $this->l('The minimum order amount needed to use the voucher')
+						'hint'    => $this->l('The minimum order amount needed to use the voucher')
 					],
 					[
 						'type'    => 'radio',
 						'label'   => $this->l('Valid order needed: '),
 						'name'    => 'BDAY_VALID_ORDER',
-						'desc'    => $this->l('Disabled equals send to all users'),
+						'hint'    => $this->l('Disabled equals send to all users'),
 						'is_bool' => true,
 						'values'  => [
 							[
@@ -382,6 +399,12 @@ class BirthdayGift extends Module
 								'label'   => $this->l('Disabled')
 							],
 						],
+					],
+					[
+						'type'    => 'text',
+						'label'   => $this->l('Group access: '),
+						'name'    => 'BDAY_CUSTOMER_GROUP',
+						'hint'    => $this->l('Enter your group ids, separated by commas')
 					],
 				],
 				'submit' => [
@@ -414,6 +437,7 @@ class BirthdayGift extends Module
 	{
 		return [
 			'BDAY_GIFT_ACTIVE'    => Tools::getValue('BDAY_GIFT_ACTIVE', (int)Configuration::get('BDAY_GIFT_ACTIVE')),
+			'BDAY_CUSTOMER_GROUP' => Tools::getValue('BDAY_CUSTOMER_GROUP', (string)Configuration::get('BDAY_CUSTOMER_GROUP')),
 			'BDAY_VOUCHER'        => Tools::getValue('BDAY_VOUCHER', (int)Configuration::get('BDAY_VOUCHER')),
 			'BDAY_VOUCHER_TYPE'   => Tools::getValue('BDAY_VOUCHER_TYPE', (int)Configuration::get('BDAY_VOUCHER_TYPE')),
 			'BDAY_VOUCHER_VALUE'  => Tools::getValue('BDAY_VOUCHER_VALUE', (float)Configuration::get('BDAY_VOUCHER_VALUE')),

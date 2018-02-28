@@ -34,6 +34,6 @@ if (Tools::getIsset('secure_key'))
 	{
 		$birthdaygift = new BirthdayGift();
 		if ($birthdaygift->active)
-			$birthdaygift->createTodaysVouchers();
+			$birthdaygift->createTodaysBirthdays();
 	}
 }
