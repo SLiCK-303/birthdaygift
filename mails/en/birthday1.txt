@@ -3,10 +3,9 @@
 
 Hi {firstname} {lastname},
 
-{shop_name} wants to wish you a Happy Birthday!
+{shop_name} wishes you a Happy Birthday!
 
-We wish to thank you for the trust you have placed in us and want to
-wish you a Happy Birthday.  We hope you have a great day!
+We wish to thank you for the trust you have placed in us, and want to wish you a Happy Birthday.  We hope you have a great day!
 
 {shop_name} [{shop_url}] powered by
 thirty bees(tm) [https://thirtybees.com/]
