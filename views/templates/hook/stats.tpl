@@ -34,7 +34,7 @@
 	<table class="table">
 		<tr>
 			<th rowspan="2" style="width: 75px;">{l s='Date' mod='birthdaygift'}</th>
-			<th colspan="2">{l s='Customers with a birthday' mod='birthdaygift'}</th>
+			<th colspan="3">{l s='Customers with a birthday' mod='birthdaygift'}</th>
 		</tr>
 		<tr>
 			<td class="center">{l s="Sent" mod='birthdaygift'}</td>
@@ -52,7 +52,7 @@
 		</tr>
 		{foreachelse}
 			<tr>
-				<td colspan="3" style="font-weight: bold; text-align: center;">{l s='No statistics at this time.' mod='birthdaygift'}</td>
+				<td colspan="4" style="font-weight: bold; text-align: center;">{l s='No statistics at this time.' mod='birthdaygift'}</td>
 			</tr>
 		{/foreach}
 	</table>
