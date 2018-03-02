@@ -27,7 +27,7 @@ class BirthdayGift extends Module
 	public function __construct()
 	{
 		$this->name = 'birthdaygift';
-		$this->version = '2.0.0';
+		$this->version = '2.0.1';
 		$this->author = 'SLiCK-303';
 		$this->tab = 'pricing_promotion';
 		$this->need_instance = 0;
@@ -221,37 +221,52 @@ class BirthdayGift extends Module
 			if ($conf['BDAY_GIFT_VOUCHER'] == 1)
 			{
 				$voucher = $this->createVoucher((int)$email['id_customer']);
+				$voucher_id = (int) $voucher->id;
 				$code = $voucher->code;
-				$template = 2;
 			} else {
-				$voucher = false;
+				$voucher_id = 0;
 				$code = '';
-				$template = 1;
 			}
 
 			$template_vars = [
-				'{email}' => $email['email'],
-				'{lastname}' => $email['lastname'],
-				'{firstname}' => $email['firstname'],
-				'{amount}' => $amount,
-				'{days}' => (int)$conf['BDAY_GIFT_DAYS'],
+				'{email}'       => $email['email'],
+				'{lastname}'    => $email['lastname'],
+				'{firstname}'   => $email['firstname'],
+				'{amount}'      => $amount,
+				'{days}'        => (int) $conf['BDAY_GIFT_DAYS'],
 				'{voucher_num}' => $code
 			];
 
-			Mail::Send(
-				(int)$email['id_lang'],
-				'birthday'.$template.'',
-				Mail::l('Happy Birthday', (int)$email['id_lang']),
-				$template_vars,
-				$email['email'],
-				$email['firstname'].' '.$email['lastname'],
-				$shop_email,
-				$shop_name,
-				null,
-				null,
-				dirname(__FILE__).'/mails/');
+			if ($conf['BDAY_GIFT_VOUCHER'] == 1)
+			{
+				Mail::Send(
+					(int) $email['id_lang'],
+					'birthday2',
+					Mail::l('Happy Birthday - You have a voucher', (int) $email['id_lang']),
+					$template_vars,
+					$email['email'],
+					$email['firstname'].' '.$email['lastname'],
+					$shop_email,
+					$shop_name,
+					null,
+					null,
+					dirname(__FILE__).'/mails/');
+			} else {
+				Mail::Send(
+					(int) $email['id_lang'],
+					'birthday1',
+					Mail::l('Happy Birthday', (int) $email['id_lang']),
+					$template_vars,
+					$email['email'],
+					$email['firstname'].' '.$email['lastname'],
+					$shop_email,
+					$shop_name,
+					null,
+					null,
+					dirname(__FILE__).'/mails/');
+			}
 
-			$this->logEmail((int)$voucher->id, (int)$email['id_customer']);
+			$this->logEmail($voucher_id, (int)$email['id_customer']);
 		}
 	}
 
@@ -266,7 +281,7 @@ class BirthdayGift extends Module
 		]);
 
 		$cart_rule = new CartRule();
-		if ((int)$conf['BDAY_GIFT_TYPE'] == 1)
+		if ((int) $conf['BDAY_GIFT_TYPE'] == 1)
 			$cart_rule->reduction_percent = (float) $conf['BDAY_GIFT_AMOUNT'];
 		else
 			$cart_rule->reduction_amount = (float) $conf['BDAY_GIFT_AMOUNT'];
