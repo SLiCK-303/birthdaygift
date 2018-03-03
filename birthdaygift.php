@@ -81,7 +81,7 @@ class BirthdayGift extends Module
 				INDEX `id_cart_rule`(`id_cart_rule`),
 				INDEX `date_add`(`date_add`)
 			) ENGINE='._MYSQL_ENGINE_) ||
-            !$this->registerHook('actionRegisterKronaAction')
+			!$this->registerHook('actionRegisterKronaAction')
 
 		) {
 			return false;
@@ -93,6 +93,8 @@ class BirthdayGift extends Module
 	{
 		foreach ($this->conf_keys as $key)
 			Configuration::deleteByName($key);
+
+		$this->unregisterHook('actionDiscoverKronaAction');
 
 		Configuration::deleteByName('BDAY_GIFT_SECURE_KEY');
 
@@ -271,13 +273,13 @@ class BirthdayGift extends Module
 			$this->logEmail($voucher_id, (int)$email['id_customer']);
 
 			// Trigger the Krona Action
-            $hook = array(
-                'module_name' => 'birthdaygift',
-                'action_name' => 'has_birthday',
-                'id_customer' => $email['id_customer'],
-            );
+			$hook = [
+				'module_name' => 'birthdaygift',
+				'action_name' => 'has_birthday',
+				'id_customer' => $email['id_customer'],
+			];
 
-            Hook::exec('ActionExecuteKronaAction', $hook);
+			Hook::exec('ActionExecuteKronaAction', $hook);
 		}
 	}
 
@@ -348,6 +350,15 @@ class BirthdayGift extends Module
 					$cart_rule->delete();
 			}
 		}
+	}
+
+	public function hookActionRegisterKronaAction()
+	{
+		$actions = [
+			'has_birthday',
+		];
+
+		return $actions;
 	}
 
 	public function renderStats()
@@ -608,13 +619,4 @@ class BirthdayGift extends Module
 			'BDAY_GIFT_CLEAN_DB' => Tools::getValue('BDAY_GIFT_CLEAN_DB', (int) Configuration::get('BDAY_GIFT_CLEAN_DB')),
 		];
 	}
-
-    public function hookActionRegisterKronaAction() {
-
-        $actions = array(
-            'has_birthday',
-        );
-
-        return $actions;
-    }
 }
