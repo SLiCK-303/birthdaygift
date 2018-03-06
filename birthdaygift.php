@@ -377,18 +377,18 @@ class BirthdayGift extends Module
 			$stats_array = [];
 		foreach ($stats as $stat)
 		{
-			$stats_array[$stat['date_stat']][4]['nb'] = (int)$stat['nb'];
-			$stats_array[$stat['date_stat']][4]['nb_used'] = (int)$stat['nb_used'];
+			$stats_array[$stat['date_stat']][1]['nb'] = (int)$stat['nb'];
+			$stats_array[$stat['date_stat']][1]['nb_used'] = (int)$stat['nb_used'];
 		}
 
 		foreach ($stats_array as $date_stat => $array)
 		{
 			$rates = [];
-			if (isset($stats_array[$date_stat][4]['nb']) && isset($stats_array[$date_stat][4]['nb_used']) && $stats_array[$date_stat][4]['nb_used'] > 0)
-				$rates[4] = number_format(($stats_array[$date_stat][4]['nb_used'] / $stats_array[$date_stat][4]['nb']) * 100, 2, '.', '');
-			$stats_array[$date_stat][4]['nb'] = isset($stats_array[$date_stat][4]['nb']) ? (int)$stats_array[$date_stat][4]['nb'] : 0;
-			$stats_array[$date_stat][4]['nb_used'] = isset($stats_array[$date_stat][4]['nb_used']) ? (int)$stats_array[$date_stat][4]['nb_used'] : 0;
-			$stats_array[$date_stat][4]['rate'] = isset($rates[4]) ? $rates[4] : '0.00';
+			if (isset($stats_array[$date_stat][1]['nb']) && isset($stats_array[$date_stat][1]['nb_used']) && $stats_array[$date_stat][1]['nb_used'] > 0)
+				$rates[1] = number_format(($stats_array[$date_stat][1]['nb_used'] / $stats_array[$date_stat][1]['nb']) * 100, 2, '.', '');
+			$stats_array[$date_stat][1]['nb'] = isset($stats_array[$date_stat][1]['nb']) ? (int)$stats_array[$date_stat][1]['nb'] : 0;
+			$stats_array[$date_stat][1]['nb_used'] = isset($stats_array[$date_stat][1]['nb_used']) ? (int)$stats_array[$date_stat][1]['nb_used'] : 0;
+			$stats_array[$date_stat][1]['rate'] = isset($rates[1]) ? $rates[1] : '0.00';
 			ksort($stats_array[$date_stat]);
 		}
 
@@ -399,8 +399,6 @@ class BirthdayGift extends Module
 
 	public function renderForm()
 	{
-		$currency = new Currency((int)Configuration::get('PS_CURRENCY_DEFAULT'));
-
 		$c1 = $this->bdayCustomer(true);
 
 		$cron_info = '';
