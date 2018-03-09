@@ -27,7 +27,7 @@ class BirthdayGift extends Module
 	public function __construct()
 	{
 		$this->name = 'birthdaygift';
-		$this->version = '2.0.2';
+		$this->version = '2.1.0';
 		$this->author = 'SLiCK-303';
 		$this->tab = 'pricing_promotion';
 		$this->need_instance = 0;
@@ -113,6 +113,18 @@ class BirthdayGift extends Module
 			foreach ($this->conf_keys as $c)
 				if(Tools::getValue($c) !== false) // Prevent saving when URL is wrong
 					$ok &= Configuration::updateValue($c, Tools::getValue($c));
+
+			// Handling Groups
+			$groups = Group::getGroups($this->context->language->id);
+			$group_selected = [];
+			foreach ($groups as $group) {
+				$id_group = $group['id_group'];
+				if (Tools::isSubmit('BDAY_GIFT_GROUP_'.$id_group)) {
+					$group_selected[] = $id_group;
+				}
+			}
+			$ok &= Configuration::updateValue('BDAY_GIFT_GROUP', implode(',', $group_selected));
+
 			if ($ok)
 				$html .= $this->displayConfirmation($this->l('Settings updated successfully'));
 			else
@@ -145,8 +157,10 @@ class BirthdayGift extends Module
 		{
 			$query = '
 			SELECT id_cart_rule, id_customer FROM '._DB_PREFIX_.'log_bday_email
-			WHERE date_add >= CURRENT_DATE';
+			WHERE date_add >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)';
+
 			$results = Db::getInstance()->executeS($query);
+
 			foreach ($results as $line)
 			{
 				$id_list[] = $line['id_customer'];
@@ -400,6 +414,15 @@ class BirthdayGift extends Module
 	public function renderForm()
 	{
 		$c1 = $this->bdayCustomer(true);
+		$id_lang = $this->context->language->id;
+		$groups = Group::getGroups($id_lang);
+		$visitorGroup = Configuration::get('PS_UNIDENTIFIED_GROUP');
+		$guestGroup = Configuration::get('PS_GUEST_GROUP');
+		foreach ($groups as $key => $g) {
+			if (in_array($g['id_group'], [$visitorGroup, $guestGroup])) {
+				unset($groups[$key]);
+			}
+		}
 
 		$cron_info = '';
 		if (Shop::getContext() === Shop::CONTEXT_SHOP)
@@ -526,10 +549,22 @@ class BirthdayGift extends Module
 						],
 					],
 					[
-						'type'    => 'text',
-						'label'   => $this->l('Group access: '),
-						'name'    => 'BDAY_GIFT_GROUP',
-						'hint'    => $this->l('Enter your group ids, separated by commas')
+						'type'     => 'checkbox',
+						'label'    => $this->l('Group access:'),
+						'name'     => 'BDAY_GIFT_GROUP',
+						'hint'    => $this->l('Select the groups you want to send emails to'),
+						'multiple' => true,
+						'values'   => [
+							'query' => $groups,
+							'id'    => 'id_group',
+							'name'  => 'name',
+						],
+						'expand'   => (count($groups) > 3) ? [
+							'print_total' => count($groups),
+							'default'     => 'show',
+							'show'        => ['text' => $this->l('Show'), 'icon' => 'plus-sign-alt'],
+							'hide'        => ['text' => $this->l('Hide'), 'icon' => 'minus-sign-alt'],
+						] : null,
 					],
 					[
 						'type'    => 'desc',
@@ -589,32 +624,36 @@ class BirthdayGift extends Module
 		$helper->submit_action = 'submitBirthdayGift';
 		$helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
 		$helper->token = Tools::getAdminTokenLite('AdminModules');
+
+	        $vars['BDAY_GIFT_ENABLE'] = (int) Configuration::get('BDAY_GIFT_ENABLE');
+	        $vars['BDAY_GIFT_GROUP'] = (array) Configuration::get('BDAY_GIFT_GROUP');
+	        $vars['BDAY_GIFT_VOUCHER'] = (int) Configuration::get('BDAY_GIFT_VOUCHER');
+	        $vars['BDAY_GIFT_AMOUNT'] = (float) Configuration::get('BDAY_GIFT_AMOUNT');
+	        $vars['BDAY_GIFT_TYPE'] = (int) Configuration::get('BDAY_GIFT_TYPE');
+	        $vars['BDAY_GIFT_PREFIX'] = (string) Configuration::get('BDAY_GIFT_PREFIX');
+	        $vars['BDAY_GIFT_MINIMAL'] = (float) Configuration::get('BDAY_GIFT_MINIMAL');
+	        $vars['BDAY_GIFT_DAYS'] = (int) Configuration::get('BDAY_GIFT_DAYS');
+	        $vars['BDAY_GIFT_ORDER'] = (int) Configuration::get('BDAY_GIFT_ORDER');
+	        $vars['BDAY_GIFT_CLEAN_DB'] = (int) Configuration::get('BDAY_GIFT_CLEAN_DB');
+
+
+	        // Groups
+	        $group = explode(',', Configuration::get('BDAY_GIFT_GROUP'));
+	        foreach ($group as $id) {
+	            $vars['BDAY_GIFT_GROUP_'.$id] = true;
+	        }
+
 		$helper->tpl_vars = [
-			'fields_value' => $this->getConfigFieldsValues(),
+			'fields_value' => $vars,
 			'languages'    => $this->context->controller->getLanguages(),
-			'id_language'  => $this->context->language->id
+			'id_language'  => $this->context->language->id,
 		];
 
 		return $helper->generateForm([
 			$fields_form_1,
 			$fields_form_2,
-			$fields_form_3
+			$fields_form_3,
 		]);
 	}
 
-	public function getConfigFieldsValues()
-	{
-		return [
-			'BDAY_GIFT_ENABLE'   => Tools::getValue('BDAY_GIFT_ENABLE', (int) Configuration::get('BDAY_GIFT_ENABLE')),
-			'BDAY_GIFT_GROUP'    => Tools::getValue('BDAY_GIFT_GROUP', (string) Configuration::get('BDAY_GIFT_GROUP')),
-			'BDAY_GIFT_VOUCHER'  => Tools::getValue('BDAY_GIFT_VOUCHER', (int) Configuration::get('BDAY_GIFT_VOUCHER')),
-			'BDAY_GIFT_AMOUNT'   => Tools::getValue('BDAY_GIFT_AMOUNT', (float) Configuration::get('BDAY_GIFT_AMOUNT')),
-			'BDAY_GIFT_TYPE'     => Tools::getValue('BDAY_GIFT_TYPE', (int) Configuration::get('BDAY_GIFT_TYPE')),
-			'BDAY_GIFT_PREFIX'   => Tools::getValue('BDAY_GIFT_PREFIX', (string) Configuration::get('BDAY_GIFT_PREFIX')),
-			'BDAY_GIFT_MINIMAL'  => Tools::getValue('BDAY_GIFT_MINIMAL', (float) Configuration::get('BDAY_GIFT_MINIMAL')),
-			'BDAY_GIFT_DAYS'     => Tools::getValue('BDAY_GIFT_DAYS', (int) Configuration::get('BDAY_GIFT_DAYS')),
-			'BDAY_GIFT_ORDER'    => Tools::getValue('BDAY_GIFT_ORDER', (int) Configuration::get('BDAY_GIFT_ORDER')),
-			'BDAY_GIFT_CLEAN_DB' => Tools::getValue('BDAY_GIFT_CLEAN_DB', (int) Configuration::get('BDAY_GIFT_CLEAN_DB')),
-		];
-	}
 }
