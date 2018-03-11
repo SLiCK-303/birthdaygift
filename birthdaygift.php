@@ -287,13 +287,15 @@ class BirthdayGift extends Module
 			$this->logEmail($voucher_id, (int)$email['id_customer']);
 
 			// Trigger the Krona Action
-			$hook = [
-				'module_name' => 'birthdaygift',
-				'action_name' => 'has_birthday',
-				'id_customer' => $email['id_customer'],
-			];
-
-			Hook::exec('ActionExecuteKronaAction', $hook);
+			if (Module::isEnabled('genzo_krona'))
+			{
+				$hook = [
+					'module_name' => 'birthdaygift',
+					'action_name' => 'has_birthday',
+					'id_customer' => $email['id_customer'],
+				];
+				Hook::exec('ActionExecuteKronaAction', $hook);
+			}
 		}
 	}
 
