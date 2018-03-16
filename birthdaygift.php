@@ -124,7 +124,7 @@ class BirthdayGift extends Module
 					$group_selected[] = $id_group;
 				}
 			}
-			if ($group_selected[0] == '') {
+			if (is_null($group_selected[0])) {
 				$ok = false;
 			} else {
 				$ok &= Configuration::updateValue('BDAY_GIFT_GROUP', implode(',', $group_selected));
@@ -246,7 +246,7 @@ class BirthdayGift extends Module
 			return count($emails);
 		}
 
-		foreach ($emails as $email)	{
+		foreach ($emails as $email) {
 			if ($conf['BDAY_GIFT_VOUCHER'] == 1) {
 				$voucher = $this->createVoucher((int)$email['id_customer']);
 				$voucher_id = (int) $voucher->id;
@@ -432,6 +432,7 @@ class BirthdayGift extends Module
 	{
 		$c1 = $this->bdayCustomer(true);
 		$id_lang = $this->context->language->id;
+
 		$groups = Group::getGroups($id_lang);
 		$visitorGroup = Configuration::get('PS_UNIDENTIFIED_GROUP');
 		$guestGroup = Configuration::get('PS_GUEST_GROUP');
