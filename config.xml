@@ -2,7 +2,7 @@
 <module>
 	<name>birthdaygift</name>
 	<displayName><![CDATA[Birthday Gift]]></displayName>
-	<version><![CDATA[2.1.1]]></version>
+	<version><![CDATA[2.1.2]]></version>
 	<description><![CDATA[Offer your clients a birthday gift automatically.]]></description>
 	<author><![CDATA[SLiCK-303]]></author>
 	<tab><![CDATA[pricing_promotion]]></tab>

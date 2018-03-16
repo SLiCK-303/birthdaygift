@@ -27,7 +27,7 @@ class BirthdayGift extends Module
 	public function __construct()
 	{
 		$this->name = 'birthdaygift';
-		$this->version = '2.1.1';
+		$this->version = '2.1.2';
 		$this->author = 'SLiCK-303';
 		$this->tab = 'pricing_promotion';
 		$this->need_instance = 0;
@@ -82,7 +82,6 @@ class BirthdayGift extends Module
 				INDEX `date_add`(`date_add`)
 			) ENGINE='._MYSQL_ENGINE_) ||
 			!$this->registerHook('actionRegisterKronaAction')
-
 		) {
 			return false;
 		}
@@ -91,8 +90,9 @@ class BirthdayGift extends Module
 
 	public function uninstall()
 	{
-		foreach ($this->conf_keys as $key)
+		foreach ($this->conf_keys as $key) {
 			Configuration::deleteByName($key);
+		}
 
 		$this->unregisterHook('actionDiscoverKronaAction');
 
@@ -107,12 +107,13 @@ class BirthdayGift extends Module
 	{
 		$html = '';
 		/* Save settings */
-		if (Tools::isSubmit('submitBirthdayGift'))
-		{
+		if (Tools::isSubmit('submitBirthdayGift')) {
 			$ok = true;
-			foreach ($this->conf_keys as $c)
-				if(Tools::getValue($c) !== false) // Prevent saving when URL is wrong
+			foreach ($this->conf_keys as $c) {
+				if (Tools::getValue($c) !== false) { // Prevent saving when URL is wrong
 					$ok &= Configuration::updateValue($c, Tools::getValue($c));
+				}
+			}
 
 			// Handling Groups
 			$groups = Group::getGroups($this->context->language->id);
@@ -123,13 +124,19 @@ class BirthdayGift extends Module
 					$group_selected[] = $id_group;
 				}
 			}
-			$ok &= Configuration::updateValue('BDAY_GIFT_GROUP', implode(',', $group_selected));
+			if ($group_selected[0] == '') {
+				$ok = false;
+			} else {
+				$ok &= Configuration::updateValue('BDAY_GIFT_GROUP', implode(',', $group_selected));
+			}
 
-			if ($ok)
+			if ($ok) {
 				$html .= $this->displayConfirmation($this->l('Settings updated successfully'));
-			else
+			} else {
 				$html .= $this->displayError($this->l('Error occurred during settings update'));
+			}
 		}
+
 		$html .= $this->renderForm();
 		$html .= $this->renderStats();
 
@@ -143,8 +150,11 @@ class BirthdayGift extends Module
 			'id_cart_rule' => (int)$id_cart_rule,
 			'date_add' => date('Y-m-d H:i:s')
 		];
-		if (!empty($id_customer))
+
+		if (!empty($id_customer)) {
 			$values['id_customer'] = (int)$id_customer;
+		}
+
 		Db::getInstance()->insert('log_bday_email', $values);
 	}
 
@@ -153,18 +163,18 @@ class BirthdayGift extends Module
 		static $id_list = [];
 		static $executed = false;
 
-		if (!$executed)
-		{
+		if (!$executed) {
 			$query = '
-			SELECT id_cart_rule, id_customer FROM '._DB_PREFIX_.'log_bday_email
-			WHERE date_add >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)';
+				SELECT id_cart_rule, id_customer FROM '._DB_PREFIX_.'log_bday_email
+				WHERE date_add >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+			';
 
 			$results = Db::getInstance()->executeS($query);
 
-			foreach ($results as $line)
-			{
+			foreach ($results as $line) {
 				$id_list[] = $line['id_customer'];
 			}
+
 			$executed = true;
 		}
 
@@ -173,7 +183,7 @@ class BirthdayGift extends Module
 
 	/* For all customers with a birthday today */
 	/**
-	 * bdayCustomer send mails to all customers with a birthday today,
+	 * bdayCustomer send emails to all customers with a birthday today,
 	 * with at least one valid order in history
 	 *
 	 * @param boolean $count if set to true, will return number of customer (default : false, will send mails, no return value)
@@ -194,8 +204,7 @@ class BirthdayGift extends Module
 			'BDAY_GIFT_ORDER'
 		]);
 
-		if ((int)$conf['BDAY_GIFT_TYPE'] == 1)
-		{
+		if ((int)$conf['BDAY_GIFT_TYPE'] == 1) {
 			$amount = (float) $conf['BDAY_GIFT_AMOUNT'].'%';
 		} else {
 			$amount = '$'.(float) $conf['BDAY_GIFT_AMOUNT'];
@@ -205,8 +214,7 @@ class BirthdayGift extends Module
 
 		$email_logs = $this->getLogsEmail();
 
-		if ((int) $conf['BDAY_GIFT_ORDER'] == 1)
-		{
+		if ((int) $conf['BDAY_GIFT_ORDER'] == 1) {
 			$sql = '
 				SELECT DISTINCT c.id_customer, c.id_shop, c.id_lang, c.firstname, c.lastname, c.email
 				FROM '._DB_PREFIX_.'customer c
@@ -214,30 +222,32 @@ class BirthdayGift extends Module
 				LEFT JOIN '._DB_PREFIX_.'orders o ON (c.id_customer = o.id_customer)
 				WHERE o.valid = 1
 				AND cg.id_group IN ('.$customer_group.')
-				AND c.birthday LIKE \'%'.date('-m-d').'\'';
+				AND c.birthday LIKE \'%'.date('-m-d').'\'
+			';
 		} else {
 			$sql = '
 				SELECT DISTINCT c.id_customer, c.id_shop, c.id_lang, c.firstname, c.lastname, c.email
 				FROM '._DB_PREFIX_.'customer c
 				LEFT JOIN '._DB_PREFIX_.'customer_group cg ON (c.id_customer = cg.id_customer)
 				WHERE cg.id_group IN ('.$customer_group.')
-				AND c.birthday LIKE \'%'.date('-m-d').'\'';
+				AND c.birthday LIKE \'%'.date('-m-d').'\'
+			';
 		}
 
 		$sql .= Shop::addSqlRestriction(Shop::SHARE_CUSTOMER, 'c');
 
-		if (!empty($email_logs))
+		if (!empty($email_logs)) {
 			$sql .= ' AND c.id_customer NOT IN ('.join(',', $email_logs).') ';
+		}
 
 		$emails = Db::getInstance()->executeS($sql);
 
-		if ($count || !count($emails))
+		if ($count || !count($emails)) {
 			return count($emails);
+		}
 
-		foreach ($emails as $email)
-		{
-			if ($conf['BDAY_GIFT_VOUCHER'] == 1)
-			{
+		foreach ($emails as $email)	{
+			if ($conf['BDAY_GIFT_VOUCHER'] == 1) {
 				$voucher = $this->createVoucher((int)$email['id_customer']);
 				$voucher_id = (int) $voucher->id;
 				$code = $voucher->code;
@@ -255,8 +265,7 @@ class BirthdayGift extends Module
 				'{voucher_num}' => $code
 			];
 
-			if ($conf['BDAY_GIFT_VOUCHER'] == 1)
-			{
+			if ($conf['BDAY_GIFT_VOUCHER'] == 1) {
 				Mail::Send(
 					(int) $email['id_lang'],
 					'birthday2',
@@ -287,8 +296,7 @@ class BirthdayGift extends Module
 			$this->logEmail($voucher_id, (int)$email['id_customer']);
 
 			// Trigger the Krona Action
-			if (Module::isEnabled('genzo_krona'))
-			{
+			if (Module::isEnabled('genzo_krona')) {
 				$hook = [
 					'module_name' => 'birthdaygift',
 					'action_name' => 'has_birthday',
@@ -310,10 +318,11 @@ class BirthdayGift extends Module
 		]);
 
 		$cart_rule = new CartRule();
-		if ((int) $conf['BDAY_GIFT_TYPE'] == 1)
+		if ((int) $conf['BDAY_GIFT_TYPE'] == 1) {
 			$cart_rule->reduction_percent = (float) $conf['BDAY_GIFT_AMOUNT'];
-		else
+		} else {
 			$cart_rule->reduction_amount = (float) $conf['BDAY_GIFT_AMOUNT'];
+		}
 
 		$cart_rule->id_customer = (int)$id_customer;
 		$cart_rule->date_to = strftime('%Y-%m-%d', strtotime('+'.(int) $conf['BDAY_GIFT_DAYS'].' day'));
@@ -325,14 +334,17 @@ class BirthdayGift extends Module
 		$cart_rule->minimum_amount = (float) $conf['BDAY_GIFT_MINIMAL'];
 
 		$languages = Language::getLanguages(true);
-		foreach ($languages as $language)
+		foreach ($languages as $language) {
 			$cart_rule->name[(int)$language['id_lang']] = $this->l('Birthday Gift');
+		}
 
 		$code = (string)$conf['BDAY_GIFT_PREFIX'].'-'.Tools::strtoupper(Tools::passwdGen(10));
 		$cart_rule->code = $code;
 		$cart_rule->active = 1;
-		if (!$cart_rule->add())
+
+		if (!$cart_rule->add()) {
 			return false;
+		}
 
 		return $cart_rule;
 	}
@@ -346,12 +358,12 @@ class BirthdayGift extends Module
 			'BDAY_GIFT_CLEAN_DB'
 		]);
 
-		if ((int)$conf['BDAY_GIFT_ENABLE'])
+		if ((int)$conf['BDAY_GIFT_ENABLE']) {
 			$this->bdayCustomer();
+		}
 
 		/* Clean-up database by deleting all outdated vouchers */
-		if ($conf['BDAY_GIFT_CLEAN_DB'] == 1)
-		{
+		if ($conf['BDAY_GIFT_CLEAN_DB'] == 1) {
 			$outdated_vouchers = Db::getInstance()->executeS('
 				SELECT id_cart_rule
 				FROM '._DB_PREFIX_.'cart_rule
@@ -359,11 +371,11 @@ class BirthdayGift extends Module
 				AND code LIKE "'.$conf['BDAY_GIFT_ENABLE'].'-%"
 			');
 
-			foreach ($outdated_vouchers as $outdated_voucher)
-			{
+			foreach ($outdated_vouchers as $outdated_voucher) {
 				$cart_rule = new CartRule((int)$outdated_voucher['id_cart_rule']);
-				if (Validate::isLoadedObject($cart_rule))
+				if (Validate::isLoadedObject($cart_rule)) {
 					$cart_rule->delete();
+				}
 			}
 		}
 	}
@@ -391,20 +403,20 @@ class BirthdayGift extends Module
 			WHERE l2.date_add = l.date_add AND ocr.id_order IS NOT NULL AND o.valid = 1) nb_used
 			FROM '._DB_PREFIX_.'log_bday_email l
 			WHERE l.date_add >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
-			GROUP BY DATE_FORMAT(l.date_add, \'%Y-%m-%d\')');
+			GROUP BY DATE_FORMAT(l.date_add, \'%Y-%m-%d\')
+		');
 
-			$stats_array = [];
-		foreach ($stats as $stat)
-		{
+		$stats_array = [];
+		foreach ($stats as $stat) {
 			$stats_array[$stat['date_stat']][1]['nb'] = (int)$stat['nb'];
 			$stats_array[$stat['date_stat']][1]['nb_used'] = (int)$stat['nb_used'];
 		}
 
-		foreach ($stats_array as $date_stat => $array)
-		{
+		foreach ($stats_array as $date_stat => $array) {
 			$rates = [];
-			if (isset($stats_array[$date_stat][1]['nb']) && isset($stats_array[$date_stat][1]['nb_used']) && $stats_array[$date_stat][1]['nb_used'] > 0)
+			if (isset($stats_array[$date_stat][1]['nb']) && isset($stats_array[$date_stat][1]['nb_used']) && $stats_array[$date_stat][1]['nb_used'] > 0) {
 				$rates[1] = number_format(($stats_array[$date_stat][1]['nb_used'] / $stats_array[$date_stat][1]['nb']) * 100, 2, '.', '');
+			}
 			$stats_array[$date_stat][1]['nb'] = isset($stats_array[$date_stat][1]['nb']) ? (int)$stats_array[$date_stat][1]['nb'] : 0;
 			$stats_array[$date_stat][1]['nb_used'] = isset($stats_array[$date_stat][1]['nb_used']) ? (int)$stats_array[$date_stat][1]['nb_used'] : 0;
 			$stats_array[$date_stat][1]['rate'] = isset($rates[1]) ? $rates[1] : '0.00';
@@ -430,9 +442,9 @@ class BirthdayGift extends Module
 		}
 
 		$cron_info = '';
-		if (Shop::getContext() === Shop::CONTEXT_SHOP)
-			$cron_info = $this->l('Define the settings and paste the following URL in the crontab, or call it manually on a daily basis:').'<br />
-								<b>'.$this->context->shop->getBaseURL().'modules/birthdaygift/cron.php?secure_key='.Configuration::get('BDAY_GIFT_SECURE_KEY').'</b></p>';
+		if (Shop::getContext() === Shop::CONTEXT_SHOP) {
+			$cron_info = $this->l('Define the settings and paste the following URL in the crontab, or call it manually on a daily basis:').'<br /><b>'.$this->context->shop->getBaseURL().'modules/birthdaygift/cron.php?secure_key='.Configuration::get('BDAY_GIFT_SECURE_KEY').'</b>';
+		}
 
 		$fields_form_1 = [
 			'form' => [
@@ -494,7 +506,7 @@ class BirthdayGift extends Module
 						'type'    => 'text',
 						'label'   => $this->l('Voucher prefix: '),
 						'name'    => 'BDAY_GIFT_PREFIX',
-						'hint'    => $this->l('Prefix for the voucher code')
+						'hint'    => $this->l('Prefix for the voucher code'),
 					],
 					[
 						'type'    => 'radio',
@@ -518,7 +530,7 @@ class BirthdayGift extends Module
 						'type'    => 'text',
 						'label'   => $this->l('Voucher value: '),
 						'name'    => 'BDAY_GIFT_AMOUNT',
-						'hint'    => $this->l('The percentage or fixed amount the voucher is worth')
+						'hint'    => $this->l('The percentage or fixed amount the voucher is worth'),
 					],
 					[
 						'type'    => 'text',
@@ -557,7 +569,7 @@ class BirthdayGift extends Module
 						'type'     => 'checkbox',
 						'label'    => $this->l('Group access:'),
 						'name'     => 'BDAY_GIFT_GROUP',
-						'hint'    => $this->l('Select the groups you want to send emails to'),
+						'hint'     => $this->l('Select the groups you want to send emails to'),
 						'multiple' => true,
 						'values'   => [
 							'query' => $groups,
@@ -588,7 +600,7 @@ class BirthdayGift extends Module
 			'form' => [
 				'legend' => [
 					'title' => $this->l('General'),
-					'icon'  => 'icon-cogs'
+					'icon'  => 'icon-cogs',
 				],
 				'input'  => [
 					[
@@ -630,23 +642,23 @@ class BirthdayGift extends Module
 		$helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
 		$helper->token = Tools::getAdminTokenLite('AdminModules');
 
-	        $vars['BDAY_GIFT_ENABLE'] = (int) Configuration::get('BDAY_GIFT_ENABLE');
-	        $vars['BDAY_GIFT_GROUP'] = (array) Configuration::get('BDAY_GIFT_GROUP');
-	        $vars['BDAY_GIFT_VOUCHER'] = (int) Configuration::get('BDAY_GIFT_VOUCHER');
-	        $vars['BDAY_GIFT_AMOUNT'] = (float) Configuration::get('BDAY_GIFT_AMOUNT');
-	        $vars['BDAY_GIFT_TYPE'] = (int) Configuration::get('BDAY_GIFT_TYPE');
-	        $vars['BDAY_GIFT_PREFIX'] = (string) Configuration::get('BDAY_GIFT_PREFIX');
-	        $vars['BDAY_GIFT_MINIMAL'] = (float) Configuration::get('BDAY_GIFT_MINIMAL');
-	        $vars['BDAY_GIFT_DAYS'] = (int) Configuration::get('BDAY_GIFT_DAYS');
-	        $vars['BDAY_GIFT_ORDER'] = (int) Configuration::get('BDAY_GIFT_ORDER');
-	        $vars['BDAY_GIFT_CLEAN_DB'] = (int) Configuration::get('BDAY_GIFT_CLEAN_DB');
+		$vars['BDAY_GIFT_ENABLE'] = (int) Configuration::get('BDAY_GIFT_ENABLE');
+		$vars['BDAY_GIFT_GROUP'] = (array) Configuration::get('BDAY_GIFT_GROUP');
+		$vars['BDAY_GIFT_VOUCHER'] = (int) Configuration::get('BDAY_GIFT_VOUCHER');
+		$vars['BDAY_GIFT_AMOUNT'] = (float) Configuration::get('BDAY_GIFT_AMOUNT');
+		$vars['BDAY_GIFT_TYPE'] = (int) Configuration::get('BDAY_GIFT_TYPE');
+		$vars['BDAY_GIFT_PREFIX'] = (string) Configuration::get('BDAY_GIFT_PREFIX');
+		$vars['BDAY_GIFT_MINIMAL'] = (float) Configuration::get('BDAY_GIFT_MINIMAL');
+		$vars['BDAY_GIFT_DAYS'] = (int) Configuration::get('BDAY_GIFT_DAYS');
+		$vars['BDAY_GIFT_ORDER'] = (int) Configuration::get('BDAY_GIFT_ORDER');
+		$vars['BDAY_GIFT_CLEAN_DB'] = (int) Configuration::get('BDAY_GIFT_CLEAN_DB');
 
 
-	        // Groups
-	        $group = explode(',', Configuration::get('BDAY_GIFT_GROUP'));
-	        foreach ($group as $id) {
-	            $vars['BDAY_GIFT_GROUP_'.$id] = true;
-	        }
+		// Groups
+		$group = explode(',', Configuration::get('BDAY_GIFT_GROUP'));
+		foreach ($group as $id) {
+			$vars['BDAY_GIFT_GROUP_'.$id] = true;
+		}
 
 		$helper->tpl_vars = [
 			'fields_value' => $vars,
