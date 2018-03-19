@@ -27,13 +27,12 @@ class BirthdayGift extends Module
 	public function __construct()
 	{
 		$this->name = 'birthdaygift';
-		$this->version = '2.1.2';
+		$this->version = '2.1.3';
 		$this->author = 'SLiCK-303';
 		$this->tab = 'pricing_promotion';
 		$this->need_instance = 0;
 
 		$this->conf_keys = [
-			'BDAY_GIFT_ENABLE',
 			'BDAY_GIFT_GROUP',
 			'BDAY_GIFT_VOUCHER',
 			'BDAY_GIFT_AMOUNT',
@@ -61,7 +60,6 @@ class BirthdayGift extends Module
 	public function install()
 	{
 		if (!parent::install() ||
-			!Configuration::updateValue('BDAY_GIFT_ENABLE', 1) ||
 			!Configuration::updateValue('BDAY_GIFT_GROUP', '3') ||
 			!Configuration::updateValue('BDAY_GIFT_VOUCHER', 1) ||
 			!Configuration::updateValue('BDAY_GIFT_AMOUNT', 5) ||
@@ -353,14 +351,11 @@ class BirthdayGift extends Module
 	{
 		Context::getContext()->link = new Link(); //when this is call by cron context is not init
 		$conf = Configuration::getMultiple([
-			'BDAY_GIFT_ENABLE',
 			'BDAY_GIFT_PREFIX',
 			'BDAY_GIFT_CLEAN_DB'
 		]);
 
-		if ((int)$conf['BDAY_GIFT_ENABLE']) {
-			$this->bdayCustomer();
-		}
+		$this->bdayCustomer();
 
 		/* Clean-up database by deleting all outdated vouchers */
 		if ($conf['BDAY_GIFT_CLEAN_DB'] == 1) {
@@ -368,7 +363,7 @@ class BirthdayGift extends Module
 				SELECT id_cart_rule
 				FROM '._DB_PREFIX_.'cart_rule
 				WHERE date_to < NOW()
-				AND code LIKE "'.$conf['BDAY_GIFT_ENABLE'].'-%"
+				AND code LIKE "'.$conf['BDAY_GIFT_PREFIX'].'-%"
 			');
 
 			foreach ($outdated_vouchers as $outdated_voucher) {
@@ -465,25 +460,6 @@ class BirthdayGift extends Module
 				],
 				'input' => [
 					[
-						'type'    => 'switch',
-						'label'   => $this->l('Enable'),
-						'name'    => 'BDAY_GIFT_ENABLE',
-						'hint'    => $this->l('Activate sending of birthday message'),
-						'is_bool' => true,
-						'values'  => [
-							[
-								'id'      => 'active_on',
-								'value'   => 1,
-								'label'   => $this->l('Enabled'),
-							],
-							[
-								'id'      => 'active_off',
-								'value'   => 0,
-								'label'   => $this->l('Disabled'),
-							],
-						],
-					],
-					[
 						'type'    => 'radio',
 						'label'   => $this->l('Include voucher: '),
 						'name'    => 'BDAY_GIFT_VOUCHER',
@@ -550,7 +526,7 @@ class BirthdayGift extends Module
 						'type'    => 'radio',
 						'label'   => $this->l('Valid order needed: '),
 						'name'    => 'BDAY_GIFT_ORDER',
-						'hint'    => $this->l('Disabled equals send to all users'),
+						'hint'    => $this->l('Whether or not the customer needs to have placed an order'),
 						'is_bool' => true,
 						'values'  => [
 							[
@@ -643,7 +619,6 @@ class BirthdayGift extends Module
 		$helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
 		$helper->token = Tools::getAdminTokenLite('AdminModules');
 
-		$vars['BDAY_GIFT_ENABLE'] = (int) Configuration::get('BDAY_GIFT_ENABLE');
 		$vars['BDAY_GIFT_GROUP'] = (array) Configuration::get('BDAY_GIFT_GROUP');
 		$vars['BDAY_GIFT_VOUCHER'] = (int) Configuration::get('BDAY_GIFT_VOUCHER');
 		$vars['BDAY_GIFT_AMOUNT'] = (float) Configuration::get('BDAY_GIFT_AMOUNT');
