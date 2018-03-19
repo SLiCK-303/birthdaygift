@@ -124,7 +124,7 @@ class BirthdayGift extends Module
 					$group_selected[] = $id_group;
 				}
 			}
-			if (is_null($group_selected[0])) {
+			if (empty($group_selected[0])) {
 				$ok = false;
 			} else {
 				$ok &= Configuration::updateValue('BDAY_GIFT_GROUP', implode(',', $group_selected));
