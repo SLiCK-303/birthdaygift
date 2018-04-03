@@ -141,7 +141,6 @@ class BirthdayGift extends Module
 		return $html;
 	}
 
-	/* Log each sent e-mail */
 	private function logEmail($id_cart_rule, $id_customer = null)
 	{
 		$values = [
@@ -164,7 +163,7 @@ class BirthdayGift extends Module
 		if (!$executed) {
 			$query = '
 				SELECT id_cart_rule, id_customer FROM '._DB_PREFIX_.'log_bday_email
-				WHERE date_add >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+				WHERE date_add > DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
 			';
 
 			$results = Db::getInstance()->executeS($query);
@@ -179,15 +178,6 @@ class BirthdayGift extends Module
 		return $id_list;
 	}
 
-	/* For all customers with a birthday today */
-	/**
-	 * bdayCustomer send emails to all customers with a birthday today,
-	 * with at least one valid order in history
-	 *
-	 * @param boolean $count if set to true, will return number of customer (default : false, will send mails, no return value)
-	 *
-	 * @return void
-	 */
 	private function bdayCustomer($count = false)
 	{
 		$shop_email = (string) Configuration::get('PS_SHOP_EMAIL');
