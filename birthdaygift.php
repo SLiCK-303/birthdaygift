@@ -19,9 +19,6 @@ if (!defined('_TB_VERSION_')) {
 	exit;
 }
 
-/**
- * Class BirthdayGift
- */
 class BirthdayGift extends Module
 {
 	public function __construct()
