@@ -1,0 +1,16 @@
+
+[{shop_url}] 
+
+Beste {firstname} {lastname},
+
+{shop_name} wenst jou een hele fijne verjaardag!!
+
+Wij bedanken je voor het vertrouwen in ons.Speciaal voor je verjaardag ontvang je van ons een korting van {amount} op je aankopen. Deze kortings is {days} dagen geldig dus laat hem niet verlopen!		 
+
+Hier is je couponcode: {voucher_num}
+
+Vul deze code in bij het afrekenen in het veld "Waardebonnen". 
+
+{shop_name} [{shop_url}] powered by
+thirty bees(tm) [https://thirtybees.com/]
+
