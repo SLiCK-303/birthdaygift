@@ -24,7 +24,7 @@ class BirthdayGift extends Module
 	public function __construct()
 	{
 		$this->name = 'birthdaygift';
-		$this->version = '2.1.3';
+		$this->version = '2.1.4';
 		$this->author = 'SLiCK-303';
 		$this->tab = 'pricing_promotion';
 		$this->need_instance = 0;
