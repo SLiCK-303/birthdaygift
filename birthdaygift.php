@@ -24,7 +24,7 @@ class BirthdayGift extends Module
 	public function __construct()
 	{
 		$this->name = 'birthdaygift';
-		$this->version = '2.1.4';
+		$this->version = '2.1.5';
 		$this->author = 'SLiCK-303';
 		$this->tab = 'pricing_promotion';
 		$this->need_instance = 0;
@@ -177,6 +177,7 @@ class BirthdayGift extends Module
 
 	private function bdayCustomer($count = false)
 	{
+		$currency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
 		$shop_email = (string) Configuration::get('PS_SHOP_EMAIL');
 		$shop_name = (string) Configuration::get('PS_SHOP_NAME');
 
@@ -192,7 +193,7 @@ class BirthdayGift extends Module
 		if ((int)$conf['BDAY_GIFT_TYPE'] == 1) {
 			$amount = (float) $conf['BDAY_GIFT_AMOUNT'].'%';
 		} else {
-			$amount = '$'.(float) $conf['BDAY_GIFT_AMOUNT'];
+			$amount = Tools::displayPrice((float) $conf['BDAY_GIFT_AMOUNT'], $currency);
 		}
 
 		$customer_group = implode(',', (array) $conf['BDAY_GIFT_GROUP']);
