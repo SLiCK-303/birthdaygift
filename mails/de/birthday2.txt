@@ -1,15 +1,14 @@
-
 [{shop_url}] 
 
-Hi {firstname} {lastname},
+Hallo {firstname} {lastname},
 
-{shop_name} wishes you a Happy Birthday!
+{shop_name} wünscht Ihnen alles Gute zum Geburtstag !!
 
-We wish to thank you for the trust you have placed in us, and want to give you a discount of {amount}. This offer is valid for {days} days, so do not waste a moment! 
+Wir danken Ihnen für das Vertrauen, das Sie uns entgegengebracht haben und möchten Ihnen einen Rabatt von {amount} geben. Dieses Angebot gilt für {days} Tage!!!
 
-HERE IS YOUR COUPON: {voucher_num}
+Hier ist Ihr Gutscheincode: {voucher_num}
 
-Enter this code in your shopping cart to get your discount. 
+Geben Sie diesen Code bei Ihrer Bestellung ein, um Ihren Rabatt zu erhalten.
 
 {shop_name} [{shop_url}] powered by
 thirty bees(tm) [https://thirtybees.com/]
