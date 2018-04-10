@@ -1,11 +1,10 @@
-
 [{shop_url}] 
 
-Hi {firstname} {lastname},
+Hallo {firstname} {lastname},
 
-{shop_name} wishes you a Happy Birthday!
+{shop_name} wünscht Ihnen alles Gute zum Geburtstag
 
-We wish to thank you for the trust you have placed in us, and want to wish you a Happy Birthday.  We hope you have a great day!
+Wir danken Ihnen für das Vertrauen, das Sie uns entgegengebracht haben, und wünschen Ihnen alles Gute zum Geburtstag. Wir hoffen, Sie haben einen schönen Tag!
 
 {shop_name} [{shop_url}] powered by
 thirty bees(tm) [https://thirtybees.com/]
