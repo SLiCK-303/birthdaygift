@@ -101,6 +101,9 @@ class BirthdayGift extends Module
 	public function getContent()
 	{
 		$html = '';
+
+		$this->context->controller->addJS($this->_path.'views/js/admin.js');
+
 		/* Save settings */
 		if (Tools::isSubmit('submitBirthdayGift')) {
 			$ok = true;
@@ -448,22 +451,20 @@ class BirthdayGift extends Module
 				],
 				'input' => [
 					[
-						'type'    => 'radio',
+						'type'    => 'switch',
 						'label'   => $this->l('Include voucher: '),
 						'name'    => 'BDAY_GIFT_VOUCHER',
 						'hint'    => $this->l('Activate creating a voucher'),
-						'is_bool' => true,
 						'values'  => [
 							[
-								'id'      => 'include_voucher_enable',
+								'id'      => 'active_on',
 								'value'   => 1,
-								'checked' => 'checked',
-								'label'   => $this->l('Enabled'),
+								'label'   => $this->l('Yes'),
 							],
 							[
-								'id'      => 'include_voucher_disable',
+								'id'      => 'active_off',
 								'value'   => 0,
-								'label'   => $this->l('Disabled'),
+								'label'   => $this->l('No'),
 							],
 						],
 					],
@@ -476,16 +477,16 @@ class BirthdayGift extends Module
 					[
 						'type'    => 'radio',
 						'label'   => $this->l('Voucher type: '),
-			                        'name'   => 'BDAY_GIFT_TYPE',
+						'name'   => 'BDAY_GIFT_TYPE',
 						'hint'    => $this->l('Pick a percentage or fixed amount for the voucher'),
 						'values'  => [
 							[
-								'id'    => 'voucher_type1',
+								'id'      => 'voucher_type1',
 								'value'   => 1,
 								'label'   => $this->l('Voucher offering a percentage'),
 							],
 							[
-								'id'    => 'voucher_type2',
+								'id'      => 'voucher_type2',
 								'value'   => 2,
 								'label'   => $this->l('Voucher offering a fixed amount'),
 							],
@@ -511,22 +512,20 @@ class BirthdayGift extends Module
 						'hint'    => $this->l('The minimum order amount needed to use the voucher'),
 					],
 					[
-						'type'    => 'radio',
+						'type'    => 'switch',
 						'label'   => $this->l('Valid order needed: '),
 						'name'    => 'BDAY_GIFT_ORDER',
 						'hint'    => $this->l('Whether or not the customer needs to have placed an order'),
-						'is_bool' => true,
 						'values'  => [
 							[
-								'id'      => 'valid_order_enable',
+								'id'      => 'active_on',
 								'value'   => 1,
-								'checked' => 'checked',
-								'label'   => $this->l('Enabled'),
+								'label'   => $this->l('Yes'),
 							],
 							[
-								'id'      => 'valid_order_disable',
+								'id'      => 'active_off',
 								'value'   => 0,
-								'label'   => $this->l('Disabled'),
+								'label'   => $this->l('No'),
 							],
 						],
 					],
