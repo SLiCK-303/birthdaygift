@@ -9,7 +9,7 @@ $_MODULE['<{birthdaygift}prestashop>birthdaygift_003b06dcfe67596f17e3de26e6a436c
 $_MODULE['<{birthdaygift}prestashop>birthdaygift_fba6524bb4f34a4c7d8e84b082fc4ce1'] = 'Definieren Sie die Einstellungen und fügen Sie die folgende URL in Ihren Crontab ein oder rufen Sie diese täglich manuell auf:';
 $_MODULE['<{birthdaygift}prestashop>birthdaygift_a82be0f551b8708bc08eb33cd9ded0cf'] = 'Information';
 $_MODULE['<{birthdaygift}prestashop>birthdaygift_4dd169bc74701e14ae666f19af9b5f5f'] = 'E-Mails zu versenden';
-$_MODULE['<{birthdaygift}prestashop>birthdaygift_20227c48cb774b0419ba5c957cb52c26'] = 'Gutschein einschließen:';
+$_MODULE['<{birthdaygift}prestashop>birthdaygift_20227c48cb774b0419ba5c957cb52c26'] = 'Gutschein aktiv:';
 $_MODULE['<{birthdaygift}prestashop>birthdaygift_c0f010efd1da59fceb7037642ad4a4ee'] = 'Aktivieren Sie die Erstellung eines Gutscheins';
 $_MODULE['<{birthdaygift}prestashop>birthdaygift_00d23a76e43b46dae9ec7aa9dcbebb32'] = 'Aktiviert';
 $_MODULE['<{birthdaygift}prestashop>birthdaygift_b9f5c797ebbf55adccdd8539a65a0241'] = 'Deaktiviert';
