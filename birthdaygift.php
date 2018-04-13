@@ -436,8 +436,8 @@ class BirthdayGift extends Module
 		$fields_form_1 = [
 			'form' => [
 				'legend' => [
-					'title' => $this->l('Information'),
-					'icon'  => 'icon-cogs',
+					'title' => $this->l('Cron Information'),
+					'icon'  => 'icon-info',
 				],
 				'description' => $cron_info,
 			],
@@ -446,7 +446,7 @@ class BirthdayGift extends Module
 		$fields_form_2 = [
 			'form' => [
 				'legend' => [
-					'title' => $this->l('E-Mails to send'),
+					'title' => $this->l('Settings'),
 					'icon'  => 'icon-cogs',
 				],
 				'input' => [
@@ -547,11 +547,6 @@ class BirthdayGift extends Module
 							'hide'        => ['text' => $this->l('Hide'), 'icon' => 'minus-sign-alt'],
 						] : null,
 					],
-					[
-						'type'    => 'desc',
-						'name'    => '',
-						'text'    => sprintf($this->l('Next process will send: %d e-mail(s)'), $c1),
-					],
 				],
 				'submit' => [
 					'title' => $this->l('Save'),
@@ -563,13 +558,23 @@ class BirthdayGift extends Module
 		$fields_form_3 = [
 			'form' => [
 				'legend' => [
-					'title' => $this->l('General'),
-					'icon'  => 'icon-cogs',
+					'title' => $this->l('E-Mails to send'),
+					'icon'  => 'icon-envelope',
+				],
+				'description' => sprintf($this->l('Next process will send: %d e-mail(s)'), $c1),
+			],
+		];
+
+		$fields_form_4 = [
+			'form' => [
+				'legend' => [
+					'title' => $this->l('Database'),
+					'icon'  => 'icon-database',
 				],
 				'input'  => [
 					[
 						'type'    => 'switch',
-						'is_bool' => true, //retro-compat
+						'is_bool' => true,
 						'label'   => $this->l('Delete outdated vouchers during each launch to clean database'),
 						'name'    => 'BDAY_GIFT_CLEAN_DB',
 						'values'  => [
@@ -633,6 +638,7 @@ class BirthdayGift extends Module
 			$fields_form_1,
 			$fields_form_2,
 			$fields_form_3,
+			$fields_form_4,
 		]);
 	}
 
