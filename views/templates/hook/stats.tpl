@@ -25,18 +25,18 @@
 	</ul>
 	<table class="table">
 		<tr>
-			<td width="75px" class="center"><b>{l s="Date" mod='birthdaygift'}</b></td>
-			<td width="33%" class="center"><b>{l s="Sent" mod='birthdaygift'}</b></td>
-			<td width="33%" class="center"><b>{l s="Used" mod='birthdaygift'}</b></td>
-			<td width="33%" class="center"><b>{l s='Conversion (%)' mod='birthdaygift'}</b></td>
+			<th class="center" style="width: 75px;"><b>{l s="Date" mod='birthdaygift'}</b></th>
+			<th class="center" style="width: 33%;"><b>{l s="Sent" mod='birthdaygift'}</b></th>
+			<th class="center" style="width: 33%;"><b>{l s="Used" mod='birthdaygift'}</b></th>
+			<th class="center" style="width: 33%;"><b>{l s='Conversion (%)' mod='birthdaygift'}</b></th>
 		</tr>
 		{foreach from=$stats_array key='date' item='stats'}
 		<tr>
-			<td width="75px" class="center">{$date|escape:'htmlall':'UTF-8'}</td>
+			<td class="center" style="width: 75px;">{$date|escape:'htmlall':'UTF-8'}</td>
 			{foreach from=$stats key='key' item='val'}
-				<td width="33%" class="center">{$val.nb|escape:'htmlall':'UTF-8'}</td>
-				<td width="33%" class="center">{$val.nb_used|escape:'htmlall':'UTF-8'}</td>
-				<td width="33%" class="center"><b>{$val.rate|escape:'htmlall':'UTF-8'}</b></td>
+				<td class="center" style="width: 33%;">{$val.nb|escape:'htmlall':'UTF-8'}</td>
+				<td class="center" style="width: 33%;">{$val.nb_used|escape:'htmlall':'UTF-8'}</td>
+				<td class="center" style="width: 33%;"><b>{$val.rate|escape:'htmlall':'UTF-8'}</b></td>
 			{/foreach}	
 		</tr>
 		{foreachelse}
