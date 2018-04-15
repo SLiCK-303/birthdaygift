@@ -381,7 +381,7 @@ class BirthdayGift extends Module
 	public function renderStats()
 	{
 		$stats = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-			SELECT DATE_FORMAT(l.date_add, \'%Y-%m-%d\') date_stat, l.id_cart_rule, COUNT(l.id_log_email) nb,
+			SELECT DATE_FORMAT(l.date_add, \'%m-%d-%Y\') date_stat, l.id_cart_rule, COUNT(l.id_log_email) nb,
 			(SELECT COUNT(l2.id_cart_rule)
 			FROM '._DB_PREFIX_.'log_bday_email l2
 			LEFT JOIN '._DB_PREFIX_.'order_cart_rule ocr ON (ocr.id_cart_rule = l2.id_cart_rule)
@@ -389,7 +389,7 @@ class BirthdayGift extends Module
 			WHERE l2.date_add = l.date_add AND ocr.id_order IS NOT NULL AND o.valid = 1) nb_used
 			FROM '._DB_PREFIX_.'log_bday_email l
 			WHERE l.date_add >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
-			GROUP BY DATE_FORMAT(l.date_add, \'%Y-%m-%d\')
+			GROUP BY DATE_FORMAT(l.date_add, \'%m-%d-%Y\')
 		');
 
 		$stats_array = [];
