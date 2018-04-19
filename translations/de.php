@@ -1,4 +1,5 @@
 <?php
+
 global $_MODULE;
 $_MODULE = array();
 $_MODULE['<{birthdaygift}prestashop>birthdaygift_7c3499f7218126b2ba812ed14e05e4f0'] = 'Gutschein zum Geburtstag';
@@ -7,12 +8,12 @@ $_MODULE['<{birthdaygift}prestashop>birthdaygift_f71a41841c80c2ef0ec02a6ad5449c6
 $_MODULE['<{birthdaygift}prestashop>birthdaygift_462390017ab0938911d2d4e964c0cab7'] = 'Einstellungen wurden erfolgreich aktualisiert';
 $_MODULE['<{birthdaygift}prestashop>birthdaygift_003b06dcfe67596f17e3de26e6a436c8'] = 'Beim Aktualisieren der Einstellungen ist ein Fehler aufgetreten';
 $_MODULE['<{birthdaygift}prestashop>birthdaygift_fba6524bb4f34a4c7d8e84b082fc4ce1'] = 'Definieren Sie die Einstellungen und fügen Sie die folgende URL in Ihren Crontab ein oder rufen Sie diese täglich manuell auf:';
-$_MODULE['<{birthdaygift}prestashop>birthdaygift_a82be0f551b8708bc08eb33cd9ded0cf'] = 'Information';
-$_MODULE['<{birthdaygift}prestashop>birthdaygift_4dd169bc74701e14ae666f19af9b5f5f'] = 'E-Mails zu versenden';
+$_MODULE['<{birthdaygift}prestashop>birthdaygift_8d2ed33eda0b9f783929195f43412c41'] = 'Cron Information';
+$_MODULE['<{birthdaygift}prestashop>birthdaygift_f4f70727dc34561dfde1a3c529b6205c'] = 'die Einstellungen';
 $_MODULE['<{birthdaygift}prestashop>birthdaygift_20227c48cb774b0419ba5c957cb52c26'] = 'Gutschein aktiv:';
 $_MODULE['<{birthdaygift}prestashop>birthdaygift_c0f010efd1da59fceb7037642ad4a4ee'] = 'Aktivieren Sie die Erstellung eines Gutscheins';
-$_MODULE['<{birthdaygift}prestashop>birthdaygift_00d23a76e43b46dae9ec7aa9dcbebb32'] = 'Aktiviert';
-$_MODULE['<{birthdaygift}prestashop>birthdaygift_b9f5c797ebbf55adccdd8539a65a0241'] = 'Deaktiviert';
+$_MODULE['<{birthdaygift}prestashop>birthdaygift_93cba07454f06a4a960172bbd6e2a435'] = 'Ja';
+$_MODULE['<{birthdaygift}prestashop>birthdaygift_bafd7322c6e97d25b6299b5d6fe8920b'] = 'Nein';
 $_MODULE['<{birthdaygift}prestashop>birthdaygift_6f44d60f913744d61129783066ef1a25'] = 'Gutscheinpräfix:';
 $_MODULE['<{birthdaygift}prestashop>birthdaygift_fd196f743c7d972d5847734d752daaa7'] = 'Präfix für den Gutscheincode';
 $_MODULE['<{birthdaygift}prestashop>birthdaygift_3926ad75365574d07232ff906355ee63'] = 'Gutschein-Typ:';
@@ -32,18 +33,21 @@ $_MODULE['<{birthdaygift}prestashop>birthdaygift_1bd33faf04b6c7e0090de4f3e591517
 $_MODULE['<{birthdaygift}prestashop>birthdaygift_cd880f6a2cee812dc8bea074d9c25d36'] = 'Wählen Sie die Gruppen aus, an die Sie E-Mails senden möchten';
 $_MODULE['<{birthdaygift}prestashop>birthdaygift_498f79c4c5bbde77f1bceb6c86fd0f6d'] = 'Zeigen';
 $_MODULE['<{birthdaygift}prestashop>birthdaygift_62a5e490880a92eef74f167d9dc6dca0'] = 'Verstecken';
-$_MODULE['<{birthdaygift}prestashop>birthdaygift_f120254f109d626d73ddddeb9cda26e5'] = 'Beim nächsten Vorgang werden %d E-Mail (s) gesendeet';
 $_MODULE['<{birthdaygift}prestashop>birthdaygift_c9cc8cce247e49bae79f15173ce97354'] = 'Speichern';
-$_MODULE['<{birthdaygift}prestashop>birthdaygift_0db377921f4ce762c62526131097968f'] = 'Allgemein';
+$_MODULE['<{birthdaygift}prestashop>birthdaygift_4dd169bc74701e14ae666f19af9b5f5f'] = 'E-Mails zu versenden';
+$_MODULE['<{birthdaygift}prestashop>birthdaygift_f120254f109d626d73ddddeb9cda26e5'] = 'Beim nächsten Vorgang werden %d E-Mail (s) gesendeet';
+$_MODULE['<{birthdaygift}prestashop>birthdaygift_e307db07b3975fef922a80d07455ee5e'] = 'Datenbank';
 $_MODULE['<{birthdaygift}prestashop>birthdaygift_c8404f4d346aa912c26cf3c53add9632'] = 'Löschen Sie bei jedem Start veraltete Gutscheine, um die Datenbank zu bereinigen';
+$_MODULE['<{birthdaygift}prestashop>birthdaygift_00d23a76e43b46dae9ec7aa9dcbebb32'] = 'Aktiviert';
+$_MODULE['<{birthdaygift}prestashop>birthdaygift_b9f5c797ebbf55adccdd8539a65a0241'] = 'Deaktiviert';
 $_MODULE['<{birthdaygift}prestashop>stats_c33e404a441c6ba9648f88af3c68a1ca'] = 'Statistik';
 $_MODULE['<{birthdaygift}prestashop>stats_dfc7d0b719158a75e0d324cc74f3185e'] = 'Detaillierte Statistik der letzten 30 Tage:';
-$_MODULE['<{birthdaygift}prestashop>stats_d41455f28486975bfab163b66a473502'] = 'Gesendet = Anzahl der gesendeten E-Mails';
+$_MODULE['<{birthdaygift}prestashop>stats_a0071698681b7da543642fe4413f0517'] = 'Datum = Datum der gesendeten e-mails';
+$_MODULE['<{birthdaygift}prestashop>stats_d41455f28486975bfab163b66a473502'] = 'Gesendet = Anzahl der gesendeten e-mails';
 $_MODULE['<{birthdaygift}prestashop>stats_4b416f06e3eea5059973acaa8325c8fa'] = 'Verwendet = Anzahl der verwendeten Rabatte (nur für gültige Bestellungen)';
 $_MODULE['<{birthdaygift}prestashop>stats_3c4d61c4fbde6177beb0f337711bde6c'] = 'Umwandlung in % = Konversationsrate';
 $_MODULE['<{birthdaygift}prestashop>stats_44749712dbec183e983dcd78a7736c41'] = 'Datum';
-$_MODULE['<{birthdaygift}prestashop>stats_070787c8aec194b0818ee024630b971d'] = 'Kunden mit einem Geburtstag';
 $_MODULE['<{birthdaygift}prestashop>stats_7f8c0283f16925caed8e632086b81b9c'] = 'Gesendet';
 $_MODULE['<{birthdaygift}prestashop>stats_019d1ca7d50cc54b995f60d456435e87'] = 'Verwendet';
-$_MODULE['<{birthdaygift}prestashop>stats_476d1393bbe84d62f25e2ce2ec3cd61c'] = 'Umwandlung';
+$_MODULE['<{birthdaygift}prestashop>stats_476d1393bbe84d62f25e2ce2ec3cd61c'] = 'Umwandlung (%)';
 $_MODULE['<{birthdaygift}prestashop>stats_85b6769250887ba6c16099596c75164d'] = 'Zur Zeit keine Statistiken.';
