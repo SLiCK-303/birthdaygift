@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2018 SLiCK-303
+ * Copyright (C) 2019 SLiCK-303
  *
  * NOTICE OF LICENSE
  *
@@ -11,7 +11,7 @@
  *
  * @package    birthdaygift
  * @author     SLiCK-303 <slick_303@hotmail.com>
- * @copyright  2018 SLiCK-303
+ * @copyright  2019 SLiCK-303
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 **/
 
@@ -24,7 +24,7 @@ class BirthdayGift extends Module
 	public function __construct()
 	{
 		$this->name = 'birthdaygift';
-		$this->version = '2.1.6';
+		$this->version = '2.2.0';
 		$this->author = 'SLiCK-303';
 		$this->tab = 'pricing_promotion';
 		$this->need_instance = 0;
@@ -56,46 +56,29 @@ class BirthdayGift extends Module
 
 	public function install()
 	{
-		if (!parent::install() ||
-			!Configuration::updateValue('BDAY_GIFT_GROUP', '3') ||
-			!Configuration::updateValue('BDAY_GIFT_VOUCHER', 1) ||
-			!Configuration::updateValue('BDAY_GIFT_AMOUNT', 5) ||
-			!Configuration::updateValue('BDAY_GIFT_TYPE', 2) ||
-			!Configuration::updateValue('BDAY_GIFT_PREFIX', 'BDAY') ||
-			!Configuration::updateValue('BDAY_GIFT_MINIMAL', 5) ||
-			!Configuration::updateValue('BDAY_GIFT_DAYS', 30) ||
-			!Configuration::updateValue('BDAY_GIFT_ORDER', 1) ||
-			!Configuration::updateValue('BDAY_GIFT_CLEAN_DB', 0) ||
-			!Db::getInstance()->execute('
-				CREATE TABLE '._DB_PREFIX_.'log_bday_email (
-				`id_log_email` int(11) NOT NULL AUTO_INCREMENT,
-				`id_customer` int(11) NOT NULL,
-				`id_cart_rule` int(11) NOT NULL,
-				`date_add` datetime NOT NULL,
-				PRIMARY KEY (`id_log_email`),
-				INDEX `id_cart_rule`(`id_cart_rule`),
-				INDEX `date_add`(`date_add`)
-			) ENGINE='._MYSQL_ENGINE_) ||
-			!$this->registerHook('actionRegisterKronaAction')
-		) {
-			return false;
-		}
-		return true;
+		return (
+			parent::install() &&
+			$this->registerHooks() &&
+			$this->insertConfiguration() &&
+			$this->createTable()
+		);
 	}
 
 	public function uninstall()
 	{
-		foreach ($this->conf_keys as $key) {
-			Configuration::deleteByName($key);
-		}
-
-		$this->unregisterHook('actionDiscoverKronaAction');
-
-		Configuration::deleteByName('BDAY_GIFT_SECURE_KEY');
-
-		Db::getInstance()->execute('DROP TABLE '._DB_PREFIX_.'log_bday_email');
-
+		$this->dropTable();
+		$this->deleteConfiguration(true);
+		$this->unregisterHooks();
 		return parent::uninstall();
+	}
+
+	public function reset()
+	{
+		$this->deleteConfiguration(false);
+		$this->unregisterHooks();
+		$this->registerHooks();
+		$this->insertConfiguration();
+		return true;
 	}
 
 	public function getContent()
@@ -642,4 +625,58 @@ class BirthdayGift extends Module
 		]);
 	}
 
+	private function registerHooks()
+	{
+		return (
+			$this->registerHook('actionRegisterKronaAction')
+		);
+	}
+
+	private function unregisterHooks()
+	{
+		$this->unregisterHook('actionRegisterKronaAction');
+	}
+
+	private function insertConfiguration()
+	{
+		return (
+			Configuration::updateValue('BDAY_GIFT_GROUP', '3') &&
+			Configuration::updateValue('BDAY_GIFT_VOUCHER', 1) &&
+			Configuration::updateValue('BDAY_GIFT_AMOUNT', 5) &&
+			Configuration::updateValue('BDAY_GIFT_TYPE', 2) &&
+			Configuration::updateValue('BDAY_GIFT_PREFIX', 'BDAY') &&
+			Configuration::updateValue('BDAY_GIFT_MINIMAL', 5) &&
+			Configuration::updateValue('BDAY_GIFT_DAYS', 30) &&
+			Configuration::updateValue('BDAY_GIFT_ORDER', 1) &&
+			Configuration::updateValue('BDAY_GIFT_CLEAN_DB', 0)
+		);
+	}
+
+	private function deleteConfiguration($all=false)
+	{
+		foreach ($this->conf_keys as $key) {
+			Configuration::deleteByName($key);
+		}
+		if ($all) {
+			Configuration::deleteByName('BDAY_GIFT_SECURE_KEY');
+		}
+	}
+
+	private function createTable()
+	{
+		return Db::getInstance()->execute('
+			CREATE TABLE '._DB_PREFIX_.'log_bday_email (
+			`id_log_email` int(11) NOT NULL AUTO_INCREMENT,
+			`id_customer` int(11) NOT NULL,
+			`id_cart_rule` int(11) NOT NULL,
+			`date_add` datetime NOT NULL,
+			PRIMARY KEY (`id_log_email`),
+			INDEX `id_cart_rule`(`id_cart_rule`),
+			INDEX `date_add`(`date_add`)
+		) ENGINE='._MYSQL_ENGINE_);
+	}
+
+	private function dropTable() {
+		Db::getInstance()->execute('DROP TABLE '._DB_PREFIX_.'log_bday_email');
+	}
 }
