@@ -7,6 +7,4 @@ Hi {firstname} {lastname},
 
 Wij bedanken je voor het vertrouwen in ons en wensen je een fijne verjaardag. Wij hopen dat je een fantastische dag zult hebben!
 
-{shop_name} [{shop_url}] powered by
-thirty bees(tm) [https://thirtybees.com/]
-
+{shop_name} [{shop_url}]

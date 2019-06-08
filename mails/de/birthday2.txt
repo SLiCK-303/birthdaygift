@@ -10,6 +10,5 @@ Hier ist Ihr Gutscheincode: {voucher_num}
 
 Geben Sie diesen Code bei Ihrer Bestellung ein, um Ihren Rabatt zu erhalten.
 
-{shop_name} [{shop_url}] powered by
-thirty bees(tm) [https://thirtybees.com/]
+{shop_name} [{shop_url}]
 

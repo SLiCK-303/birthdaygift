@@ -11,6 +11,4 @@ Hier is je couponcode: {voucher_num}
 
 Vul deze code in bij het afrekenen in het veld "Waardebonnen". 
 
-{shop_name} [{shop_url}] powered by
-thirty bees(tm) [https://thirtybees.com/]
-
+{shop_name} [{shop_url}]
