@@ -28,7 +28,7 @@ class BirthdayGift extends Module
 		$this->author = 'SLiCK-303';
 		$this->tab = 'pricing_promotion';
 		$this->tb_min_version = '1.0.0';
-		$this->tb_versions_compliancy = '> 1.0.0';
+		$this->tb_versions_compliancy = '>= 1.0.0';
 		$this->need_instance = 0;
 
 		$this->conf_keys = [
