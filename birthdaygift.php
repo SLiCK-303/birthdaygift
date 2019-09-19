@@ -24,7 +24,7 @@ class BirthdayGift extends Module
 	public function __construct()
 	{
 		$this->name = 'birthdaygift';
-		$this->version = '2.2.1';
+		$this->version = '2.2.2';
 		$this->author = 'SLiCK-303';
 		$this->tab = 'pricing_promotion';
 		$this->tb_min_version = '1.0.0';
@@ -40,7 +40,8 @@ class BirthdayGift extends Module
 			'BDAY_GIFT_MINIMAL',
 			'BDAY_GIFT_DAYS',
 			'BDAY_GIFT_ORDER',
-			'BDAY_GIFT_CLEAN_DB'
+			'BDAY_GIFT_CLEAN_DB',
+			'BDAY_GIFT_NEWS'
 		];
 
 		$this->bootstrap = true;
@@ -175,7 +176,8 @@ class BirthdayGift extends Module
 			'BDAY_GIFT_TYPE',
 			'BDAY_GIFT_DAYS',
 			'BDAY_GIFT_VOUCHER',
-			'BDAY_GIFT_ORDER'
+			'BDAY_GIFT_ORDER',
+			'BDAY_GIFT_NEWS'
 		]);
 
 		if ((int)$conf['BDAY_GIFT_TYPE'] == 1) {
@@ -190,7 +192,7 @@ class BirthdayGift extends Module
 
 		if ((int) $conf['BDAY_GIFT_ORDER'] == 1) {
 			$sql = '
-				SELECT DISTINCT c.id_customer, c.id_shop, c.id_lang, c.firstname, c.lastname, c.email
+				SELECT DISTINCT c.id_customer, c.id_shop, c.id_lang, c.firstname, c.lastname, c.email, c.newsletter
 				FROM '._DB_PREFIX_.'customer c
 				LEFT JOIN '._DB_PREFIX_.'customer_group cg ON (c.id_customer = cg.id_customer)
 				LEFT JOIN '._DB_PREFIX_.'orders o ON (c.id_customer = o.id_customer)
@@ -200,7 +202,7 @@ class BirthdayGift extends Module
 			';
 		} else {
 			$sql = '
-				SELECT DISTINCT c.id_customer, c.id_shop, c.id_lang, c.firstname, c.lastname, c.email
+				SELECT DISTINCT c.id_customer, c.id_shop, c.id_lang, c.firstname, c.lastname, c.email, c.newsletter
 				FROM '._DB_PREFIX_.'customer c
 				LEFT JOIN '._DB_PREFIX_.'customer_group cg ON (c.id_customer = cg.id_customer)
 				WHERE cg.id_group IN ('.$customer_group.')
@@ -209,6 +211,10 @@ class BirthdayGift extends Module
 		}
 
 		$sql .= Shop::addSqlRestriction(Shop::SHARE_CUSTOMER, 'c');
+
+		if ((int) $conf['BDAY_GIFT_NEWS'] == 1) {
+			$sql .= ' AND c.newsletter = 1';
+		}
 
 		if (!empty($email_logs)) {
 			$sql .= ' AND c.id_customer NOT IN ('.join(',', $email_logs).') ';
@@ -437,7 +443,7 @@ class BirthdayGift extends Module
 				'input' => [
 					[
 						'type'    => 'switch',
-						'label'   => $this->l('Include voucher: '),
+						'label'   => $this->l('Include voucher:'),
 						'name'    => 'BDAY_GIFT_VOUCHER',
 						'hint'    => $this->l('Activate creating a voucher'),
 						'values'  => [
@@ -455,13 +461,13 @@ class BirthdayGift extends Module
 					],
 					[
 						'type'    => 'text',
-						'label'   => $this->l('Voucher prefix: '),
+						'label'   => $this->l('Voucher prefix:'),
 						'name'    => 'BDAY_GIFT_PREFIX',
 						'hint'    => $this->l('Prefix for the voucher code'),
 					],
 					[
 						'type'    => 'radio',
-						'label'   => $this->l('Voucher type: '),
+						'label'   => $this->l('Voucher type:'),
 						'name'   => 'BDAY_GIFT_TYPE',
 						'hint'    => $this->l('Pick a percentage or fixed amount for the voucher'),
 						'values'  => [
@@ -479,7 +485,7 @@ class BirthdayGift extends Module
 					],
 					[
 						'type'    => 'text',
-						'label'   => $this->l('Voucher value: '),
+						'label'   => $this->l('Voucher value:'),
 						'name'    => 'BDAY_GIFT_AMOUNT',
 						'hint'    => $this->l('The percentage or fixed amount the voucher is worth'),
 					],
@@ -492,13 +498,13 @@ class BirthdayGift extends Module
 					],
 					[
 						'type'    => 'text',
-						'label'   => $this->l('Minimal Order: '),
+						'label'   => $this->l('Minimal Order:'),
 						'name'    => 'BDAY_GIFT_MINIMAL',
 						'hint'    => $this->l('The minimum order amount needed to use the voucher'),
 					],
 					[
 						'type'    => 'switch',
-						'label'   => $this->l('Valid order needed: '),
+						'label'   => $this->l('Valid order needed:'),
 						'name'    => 'BDAY_GIFT_ORDER',
 						'hint'    => $this->l('Whether or not the customer needs to have placed an order'),
 						'values'  => [
@@ -531,6 +537,24 @@ class BirthdayGift extends Module
 							'show'        => ['text' => $this->l('Show'), 'icon' => 'plus-sign-alt'],
 							'hide'        => ['text' => $this->l('Hide'), 'icon' => 'minus-sign-alt'],
 						] : null,
+					],
+					[
+						'type'    => 'switch',
+						'label'   => $this->l('Newsletter subscription:'),
+						'name'    => 'BDAY_GIFT_NEWS',
+						'hint'    => $this->l('Send emails to newletter subscribers only'),
+						'values'  => [
+							[
+								'id'      => 'active_on',
+								'value'   => 1,
+								'label'   => $this->l('Yes'),
+							],
+							[
+								'id'      => 'active_off',
+								'value'   => 0,
+								'label'   => $this->l('No'),
+							],
+						],
 					],
 				],
 				'submit' => [
@@ -605,7 +629,7 @@ class BirthdayGift extends Module
 		$vars['BDAY_GIFT_DAYS'] = (int) Configuration::get('BDAY_GIFT_DAYS');
 		$vars['BDAY_GIFT_ORDER'] = (int) Configuration::get('BDAY_GIFT_ORDER');
 		$vars['BDAY_GIFT_CLEAN_DB'] = (int) Configuration::get('BDAY_GIFT_CLEAN_DB');
-
+		$vars['BDAY_GIFT_NEWS'] = (int) Configuration::get('BDAY_GIFT_NEWS');
 
 		// Groups
 		$group = explode(',', Configuration::get('BDAY_GIFT_GROUP'));
@@ -650,7 +674,8 @@ class BirthdayGift extends Module
 			Configuration::updateValue('BDAY_GIFT_MINIMAL', 5) &&
 			Configuration::updateValue('BDAY_GIFT_DAYS', 30) &&
 			Configuration::updateValue('BDAY_GIFT_ORDER', 1) &&
-			Configuration::updateValue('BDAY_GIFT_CLEAN_DB', 0)
+			Configuration::updateValue('BDAY_GIFT_CLEAN_DB', 0) &&
+			Configuration::updateValue('BDAY_GIFT_NEWS', 1)
 		);
 	}
 
